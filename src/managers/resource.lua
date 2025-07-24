@@ -1,3 +1,8 @@
+--
+-- Author: Matheus R. Oliveira
+-- Github: matheusoreis
+--
+
 local Object = require('src.lib.classic')
 
 --- @class Resource : Object
