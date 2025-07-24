@@ -5,14 +5,14 @@
 
 local Object = require('src.lib.classic')
 
---- @class Input : Object
+--- @class InputManager : Object
 --- @field private keymap table<string, string[]>
 --- @field private pressed table<string, boolean>
 --- @field private released table<string, boolean>
 --- @field private down table<string, boolean>
-local Input = Object:extend()
+local InputManager = Object:extend()
 
-function Input:new()
+function InputManager:new()
   self.keymap = {
     a     = { "s", "gamepad:a" },
     b     = { "d", "gamepad:b" },
@@ -36,9 +36,8 @@ function Input:new()
   self.down = {}
 end
 
---- Chamado quando uma tecla for pressionada.
 --- @param key string
-function Input:key_pressed(key)
+function InputManager:key_pressed(key)
   -- Encontra todos os símbolos associados a esta tecla
   for symbol, keys in pairs(self.keymap) do
     for _, mapped_key in ipairs(keys) do
@@ -50,9 +49,8 @@ function Input:key_pressed(key)
   end
 end
 
---- Chamado quando uma tecla for solta
 --- @param key string
-function Input:key_released(key)
+function InputManager:key_released(key)
   -- Encontra todos os símbolos associados a esta tecla
   for symbol, keys in pairs(self.keymap) do
     for _, mapped_key in ipairs(keys) do
@@ -64,23 +62,20 @@ function Input:key_released(key)
   end
 end
 
---- Chamado quando um botão de gamepad for pressionado
 --- @param button string
-function Input:gamepad_pressed(button)
+function InputManager:gamepad_pressed(button)
   local key = "gamepad:" .. button
   self:key_pressed(key)
 end
 
---- Chamado quando um botão de gamepad for solto
 --- @param button string
-function Input:gamepad_released(button)
+function InputManager:gamepad_released(button)
   local key = "gamepad:" .. button
   self:key_released(key)
 end
 
---- Atualiza os estados de direção do analógico esquerdo do joystick.
 --- @param joystick love.Joystick
-function Input:update_gamepad_axes(joystick)
+function InputManager:update_gamepad_axes(joystick)
   local deadzone = 0.3
 
   local x = joystick:getGamepadAxis("leftx")
@@ -105,33 +100,27 @@ function Input:update_gamepad_axes(joystick)
   end
 end
 
---- @private
---- Verifica se um símbolo foi pressionado neste frame
 --- @param symbol string
 --- @return boolean
-function Input:is_pressed(symbol)
+function InputManager:is_pressed(symbol)
   return self.pressed[symbol] == true
 end
 
---- Verifica se um símbolo foi liberado neste frame
 --- @param symbol string
 --- @return boolean
-function Input:is_released(symbol)
+function InputManager:is_released(symbol)
   return self.released[symbol] == true
 end
 
---- Verifica se um símbolo está sendo mantido
 --- @param symbol string
 --- @return boolean
-function Input:is_down(symbol)
+function InputManager:is_down(symbol)
   return self.down[symbol] == true
 end
 
---- Atualiza o estado de entrada
-function Input:update()
-  -- Limpa os estados temporários do frame
+function InputManager:update(dt)
   self.pressed = {}
   self.released = {}
 end
 
-return Input
+return InputManager

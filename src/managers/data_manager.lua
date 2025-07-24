@@ -6,52 +6,45 @@
 local Object = require('src.lib.classic')
 local json = require('src.lib.json')
 
---- @class Data : Object
---- @field private save_path string Caminho base para salvar os arquivos
-local Data = Object:extend()
+--- @class DataManager : Object
+--- @field private save_path string
+local DataManager = Object:extend()
 
-function Data:new()
-  -- Define o diretório base para salvar os arquivos
+function DataManager:new()
   self.save_path = "data/"
 
-  -- Garante que o diretório de saves existe
   if not love.filesystem.getInfo(self.save_path) then
     love.filesystem.createDirectory(self.save_path)
   end
 end
 
---- Salva dados em um arquivo JSON
---- @param name string Nome do arquivo (sem extensão)
---- @param data table Dados a serem salvos
+--- @param name string
+--- @param data table
 --- @return boolean success
---- @return string? error
-function Data:save(name, data)
+function DataManager:save(name, data)
   if type(data) ~= "table" then
-    return false, "Dados inválidos: esperava uma tabela"
+    return false
   end
 
   local filename = self.save_path .. name .. ".json"
 
-  -- Codifica os dados em JSON
   local encoded_data = json.encode(data)
   if not encoded_data then
-    return false, "Erro ao codificar JSON"
+    return false
   end
 
-  -- Tenta salvar o arquivo
-  local success, error = love.filesystem.write(filename, encoded_data)
+  local success, _ = love.filesystem.write(filename, encoded_data)
   if not success then
-    return false, "Erro ao salvar arquivo: " .. error
+    return false
   end
 
   return true
 end
 
---- Carrega dados de um arquivo JSON
---- @param name string Nome do arquivo (sem extensão)
+--- @param name string
 --- @return table|nil data
 --- @return string? error
-function Data:load(name)
+function DataManager:load(name)
   local filename = self.save_path .. name .. ".json"
 
   -- Verifica se o arquivo existe
@@ -74,4 +67,4 @@ function Data:load(name)
   return decoded_data
 end
 
-return Data
+return DataManager
