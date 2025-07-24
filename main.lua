@@ -4,7 +4,7 @@
 --
 
 local Resource = require('src.managers.resource')
-local resource = Resource:new()
+local resource = Resource()
 
 function love.load()
 end

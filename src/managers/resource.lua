@@ -12,6 +12,11 @@ function Resource:new()
   self.images = {}
 end
 
+---@private
+--- Carrega um recurso do cache ou o cria se não existir.
+--- @param cache table
+--- @param key any
+--- @param loader function
 function Resource:loadCache(cache, key, loader)
   if not cache[key] then
     cache[key] = loader()
@@ -20,6 +25,9 @@ function Resource:loadCache(cache, key, loader)
   return cache[key]
 end
 
+--- Obtem os shaders.
+--- @param name string
+--- @return love.Shader
 function Resource:getShaders(name)
   local path = 'graphics/shaders/' .. name
   return self:loadCache(self.shaders, path, function()
@@ -27,6 +35,10 @@ function Resource:getShaders(name)
   end)
 end
 
+--- Obtem as fontes.
+--- @param name string
+--- @param size number
+--- @return love.Font
 function Resource:getFonts(name, size)
   local path = 'graphics/fonts/' .. name
   self.fonts[path] = self.fonts[path] or {}
@@ -35,13 +47,17 @@ function Resource:getFonts(name, size)
   end)
 end
 
+---@private
+--- Obtem as texturas.
+--- @param path string
+--- @return love.Image
 function Resource:getTextures(path)
   return self:loadCache(self.images, path, function()
     return love.graphics.newImage(path)
   end)
 end
 
---- Obtem as texturas dos atores
+--- Obtem as texturas dos atores.
 --- @param name string
 --- @return love.Image
 function Resource:getActorTextures(name)
