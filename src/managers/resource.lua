@@ -18,11 +18,11 @@ function Resource:new()
 end
 
 ---@private
---- Carrega um recurso do cache ou o cria se não existir.
+--- Carrega um recurso do cache ou o cria se não existir
 --- @param cache table
 --- @param key any
 --- @param loader function
-function Resource:loadCache(cache, key, loader)
+function Resource:load_cache(cache, key, loader)
   if not cache[key] then
     cache[key] = loader()
   end
@@ -30,85 +30,85 @@ function Resource:loadCache(cache, key, loader)
   return cache[key]
 end
 
---- Obtem os shaders.
+--- Carrega um shader
 --- @param name string
 --- @return love.Shader
-function Resource:getShaders(name)
+function Resource:load_shader(name)
   local path = 'graphics/shaders/' .. name
-  return self:loadCache(self.shaders, path, function()
+  return self:load_cache(self.shaders, path, function()
     return love.graphics.newShader(path)
   end)
 end
 
---- Obtem as fontes.
+--- Carrega uma fonte
 --- @param name string
 --- @param size number
 --- @return love.Font
-function Resource:getFonts(name, size)
+function Resource:load_font(name, size)
   local path = 'graphics/fonts/' .. name
   self.fonts[path] = self.fonts[path] or {}
-  return self:loadCache(self.fonts[path], size, function()
+  return self:load_cache(self.fonts[path], size, function()
     return love.graphics.newFont(path, size)
   end)
 end
 
 ---@private
---- Obtem as texturas.
+--- Carrega uma imagem
 --- @param path string
 --- @return love.Image
-function Resource:getTextures(path)
-  return self:loadCache(self.images, path, function()
+function Resource:load_image(path)
+  return self:load_cache(self.images, path, function()
     return love.graphics.newImage(path)
   end)
 end
 
---- Obtem as texturas dos atores.
+--- Carrega um sprite de ator
 --- @param name string
 --- @return love.Image
-function Resource:getActorTextures(name)
-  return self:getTextures('graphics/actors/' .. name)
+function Resource:load_actor(name)
+  return self:load_image('graphics/actors/' .. name)
 end
 
---- Obtem as texturas de animação.
+--- Carrega um sprite de animação
 --- @param name string
 --- @return love.Image
-function Resource:getAnimationTextures(name)
-  return self:getTextures('graphics/animations/' .. name)
+function Resource:load_animation(name)
+  return self:load_image('graphics/animations/' .. name)
 end
 
---- Obtem as texturas de fundo.
+--- Carrega uma imagem de fundo
 --- @param name string
 --- @return love.Image
-function Resource:getBackgroundTextures(name)
-  return self:getTextures('graphics/backgrounds/' .. name)
+function Resource:load_background(name)
+  return self:load_image('graphics/backgrounds/' .. name)
 end
 
---- Obtem as texturas de inimigos.
+--- Carrega um sprite de inimigo
 --- @param name string
 --- @return love.Image
-function Resource:getEnemyTextures(name)
-  return self:getTextures('graphics/enemies/' .. name)
+function Resource:load_enemy(name)
+  return self:load_image('graphics/enemies/' .. name)
 end
 
---- Obtem as texturas do sistema.
+--- Carrega uma imagem do sistema
 --- @param name string
 --- @return love.Image
-function Resource:getSystemTextures(name)
-  return self:getTextures('graphics/system/' .. name)
+function Resource:load_system(name)
+  return self:load_image('graphics/system/' .. name)
 end
 
---- Obtem as texturas dos tilesets.
+--- Carrega um tileset
 --- @param name string
 --- @return love.Image
-function Resource:getTilesetTextures(name)
-  return self:getTextures('graphics/tilesets/' .. name)
+function Resource:load_tileset(name)
+  return self:load_image('graphics/tilesets/' .. name)
 end
 
---- Obtem as texturas do título.
+--- Carrega uma imagem de título
 --- @param name string
 --- @return love.Image
-function Resource:getTitleTextures(name)
-  return self:getTextures('graphics/titles/' .. name)
+function Resource:load_title(name)
+  return self:load_image('graphics/titles/' .. name)
 end
 
 return Resource

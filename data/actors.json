@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Raizen",
+    "textures": {
+      "sprite": "fighter01.png",
+      "face": "fighter01_face.png"
+    },
+    "level": 1,
+    "exp": 0,
+    "stats": {
+      "hp": [
+        30,
+        35,
+        40
+      ],
+      "mp": [
+        10,
+        12,
+        14
+      ],
+      "atk": [
+        15,
+        17,
+        20
+      ],
+      "def": [
+        12,
+        14,
+        16
+      ],
+      "mat": [
+        8,
+        10,
+        12
+      ],
+      "mdf": [
+        10,
+        11,
+        13
+      ],
+      "spd": [
+        9,
+        10,
+        11
+      ],
+      "crt": 0.0,
+      "hit": 0.0,
+      "eva": 0.0
+    },
+    "skils": [],
+    "effects": [],
+    "actions": {
+      "appear": 1,
+      "miss": 1,
+      "escape": 1,
+      "win": 1
+    }
+  }
+]

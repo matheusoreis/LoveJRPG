@@ -14,15 +14,21 @@ local Input = Object:extend()
 
 function Input:new()
   self.keymap = {
-    Left  = { "left", "gamepad:dpleft", "gamepad:leftx-" },
-    Up    = { "up", "gamepad:dpup", "gamepad:lefty-" },
-    Right = { "right", "gamepad:dpright", "gamepad:leftx+" },
-    Down  = { "down", "gamepad:dpdown", "gamepad:lefty+" },
+    a     = { "s", "gamepad:a" },
+    b     = { "d", "gamepad:b" },
+    x     = { "a", "gamepad:x" },
+    y     = { "w", "gamepad:y" },
 
-    X     = { "a", "gamepad:x" },
-    Y     = { "w", "gamepad:y" },
-    B     = { "d", "gamepad:b" },
-    A     = { "s", "gamepad:a" }
+    left  = { "left", "gamepad:dpleft", "gamepad:leftx-" },
+    up    = { "up", "gamepad:dpup", "gamepad:lefty-" },
+    right = { "right", "gamepad:dpright", "gamepad:leftx+" },
+    down  = { "down", "gamepad:dpdown", "gamepad:lefty+" },
+
+    lb    = { "q", "gamepad:leftshoulder" },
+    rb    = { "e", "gamepad:rightshoulder" },
+
+    start = { "return", "gamepad:start" },
+    back  = { "escape", "gamepad:back" }
   }
 
   self.pressed = {}
@@ -32,37 +38,49 @@ end
 
 --- Chamado quando uma tecla for pressionada.
 --- @param key string
-function Input:keyPressed(key)
-  self.pressed[key] = true
-  self.down[key] = true
+function Input:key_pressed(key)
+  -- Encontra todos os símbolos associados a esta tecla
+  for symbol, keys in pairs(self.keymap) do
+    for _, mapped_key in ipairs(keys) do
+      if mapped_key == key then
+        self.pressed[symbol] = true
+        self.down[symbol] = true
+      end
+    end
+  end
 end
 
---- Chamado quando uma tecla for solta.
+--- Chamado quando uma tecla for solta
 --- @param key string
-function Input:keyReleased(key)
-  self.released[key] = true
-  self.down[key] = false
+function Input:key_released(key)
+  -- Encontra todos os símbolos associados a esta tecla
+  for symbol, keys in pairs(self.keymap) do
+    for _, mapped_key in ipairs(keys) do
+      if mapped_key == key then
+        self.released[symbol] = true
+        self.down[symbol] = false
+      end
+    end
+  end
 end
 
---- Chamado quando um botão de gamepad for pressionado.
+--- Chamado quando um botão de gamepad for pressionado
 --- @param button string
-function Input:gamepadPressed(button)
+function Input:gamepad_pressed(button)
   local key = "gamepad:" .. button
-  self.pressed[key] = true
-  self.down[key] = true
+  self:key_pressed(key)
 end
 
---- Chamado quando um botão de gamepad for solto.
+--- Chamado quando um botão de gamepad for solto
 --- @param button string
-function Input:gamepadReleased(button)
+function Input:gamepad_released(button)
   local key = "gamepad:" .. button
-  self.released[key] = true
-  self.down[key] = false
+  self:key_released(key)
 end
 
 --- Atualiza os estados de direção do analógico esquerdo do joystick.
 --- @param joystick love.Joystick
-function Input:updateGamepadAxes(joystick)
+function Input:update_gamepad_axes(joystick)
   local deadzone = 0.3
 
   local x = joystick:getGamepadAxis("leftx")
@@ -88,40 +106,30 @@ function Input:updateGamepadAxes(joystick)
 end
 
 --- @private
---- Verifica se alguma das teclas está ativa em um estado.
---- @param state table<string, boolean>
---- @param keys string[]
+--- Verifica se um símbolo foi pressionado neste frame
+--- @param symbol string
 --- @return boolean
-function Input:checkKeys(state, keys)
-  for _, key in ipairs(keys or {}) do
-    if state[key] then return true end
-  end
-  return false
+function Input:is_pressed(symbol)
+  return self.pressed[symbol] == true
 end
 
---- Verifica se a ação foi pressionada neste frame.
---- @param action string
+--- Verifica se um símbolo foi liberado neste frame
+--- @param symbol string
 --- @return boolean
-function Input:isPressed(action)
-  return self:checkKeys(self.pressed, self.keymap[action])
+function Input:is_released(symbol)
+  return self.released[symbol] == true
 end
 
---- Verifica se a ação foi liberada neste frame.
---- @param action string
+--- Verifica se um símbolo está sendo mantido
+--- @param symbol string
 --- @return boolean
-function Input:isReleased(action)
-  return self:checkKeys(self.released, self.keymap[action])
+function Input:is_down(symbol)
+  return self.down[symbol] == true
 end
 
---- Verifica se a ação está sendo mantida.
---- @param action string
---- @return boolean
-function Input:isDown(action)
-  return self:checkKeys(self.down, self.keymap[action])
-end
-
---- Atualiza o estado de entrada.
+--- Atualiza o estado de entrada
 function Input:update()
+  -- Limpa os estados temporários do frame
   self.pressed = {}
   self.released = {}
 end
