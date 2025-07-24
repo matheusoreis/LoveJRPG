@@ -3,6 +3,9 @@
 -- Github: matheusoreis
 --
 
+local Resource = require('src.managers.resource')
+local resource = Resource:new()
+
 function love.load()
 end
 
