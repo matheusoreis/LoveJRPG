@@ -37,6 +37,8 @@ local MenuScene = require("src.scenes.menu")
 Data = {}
 
 function love.load()
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
   local keys = { "actors", "animations", "effects", "enemies", "groups", "skills" }
 
   for _, key in ipairs(keys) do

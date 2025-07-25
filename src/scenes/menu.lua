@@ -6,16 +6,18 @@
 local SceneBase = require('src.game.scene')
 local WindowMenu = require("src.windows.menu_window")
 
---- @class MenuState : SceneBase
+--- @class MenuScene : SceneBase
 local MenuScene = SceneBase:extend()
 
-function MenuScene:initialize()
+function MenuScene:on_load()
   self.background = self.resource:get_title("background.png")
 
   local w, h = 200, 3 * 20 + 16
   local x = (love.graphics.getWidth() - w) / 2
   local y = (love.graphics.getHeight() - h) / 2
-  self.menu_window = WindowMenu(x, y, w, h, self.resource, self.data, nil)
+
+  self.window = WindowMenu(x, y, w, h, self.resource, self.input)
+  self.window:open(0) -- Abre imediatamente
 end
 
 function MenuScene:on_enter()
@@ -25,28 +27,17 @@ function MenuScene:on_exit()
 end
 
 function MenuScene:on_update(dt)
-  self.menu_window:update(dt)
+  self.window:update(dt)
 
-  -- Input controlado pela scene
   if self:is_pressed("y") then
-    self.menu_window:open(0.2)
+    self.window:open(0.2)
   elseif self:is_pressed("x") then
-    self.menu_window:close(0.2)
-  end
-
-  if not self.menu_window:isOpen() then return end
-
-  if self:is_pressed("up") then
-    self.menu_window:move_up()
-  elseif self:is_pressed("down") then
-    self.menu_window:move_down()
-  elseif self:is_pressed("a") then
-    local selected = self.menu_window:confirm()
-    print("Selecionado: " .. selected)
+    self.window:close(0.2)
   end
 end
 
 function MenuScene:on_draw(width, height)
+  -- Fundo em tiles
   love.graphics.setShader()
   love.graphics.setColor(1, 1, 1)
   for y = 0, math.ceil(height / 32) - 1 do
@@ -55,7 +46,8 @@ function MenuScene:on_draw(width, height)
     end
   end
 
-  self.menu_window:draw()
+  -- Janela de menu
+  self.window:draw()
 end
 
 return MenuScene

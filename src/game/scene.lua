@@ -14,7 +14,7 @@ local Object = require "src.lib.classic"
 --- @field private started boolean
 local SceneBase = Object:extend()
 
-function SceneBase:new(resource, input, data, audio, transition, ...)
+function SceneBase:new(resource, input, data, audio, transition)
   self.resource = resource
   self.input = input
   self.data = data
@@ -22,11 +22,10 @@ function SceneBase:new(resource, input, data, audio, transition, ...)
   self.transition = transition
   self.started = false
 
-  -- Permite que classes filhas recebam parâmetros adicionais
-  self:initialize(...)
+  self:on_load()
 end
 
-function SceneBase:initialize(...)
+function SceneBase:on_load()
 end
 
 --- @return boolean
