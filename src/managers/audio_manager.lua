@@ -22,8 +22,8 @@ function AudioManager:new()
   self.current_bgm = {}
   self.active_se = {}
 
-  self.bgm_volume = 0.5
-  self.se_volume = 0.5
+  self.bgm_volume = 1
+  self.se_volume = 1
 
   self:load()
 end

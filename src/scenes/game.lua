@@ -4,7 +4,7 @@
 --
 
 local SceneBase = require('src.game.scene')
-local WindowMenu = require("src.windows.menu_window")
+local WindowStartMenu = require("src.windows.start_menu")
 
 --- @class GameScene : SceneBase
 local GameScene = SceneBase:extend()
@@ -12,12 +12,13 @@ local GameScene = SceneBase:extend()
 function GameScene:on_load()
   self.background = self.resource:get_title("background.png")
 
-  local w, h = 200, 3 * 20 + 16
+  local w, h = 300, 3 * 20 + 100
   local x = (love.graphics.getWidth() - w) / 2
   local y = (love.graphics.getHeight() - h) / 2
 
-  self.window = WindowMenu(x, y, w, h, self.resource:get_system("skin.png"))
-  self.window:open(0)
+  self.window_selectable = WindowStartMenu(x, y, w, h, self.resource:get_system("skin.png"), self.resource, self.input,
+    self.audio)
+  self.window_selectable:open(0)
 end
 
 function GameScene:on_enter()
@@ -27,13 +28,7 @@ function GameScene:on_exit()
 end
 
 function GameScene:on_update(dt)
-  self.window:update(dt)
-
-  if self:is_pressed("y") then
-    self.window:open(0.2)
-  elseif self:is_pressed("x") then
-    self.window:close(0.2)
-  end
+  self.window_selectable:update(dt)
 end
 
 function GameScene:on_draw(width, height)
@@ -46,8 +41,7 @@ function GameScene:on_draw(width, height)
     end
   end
 
-  -- Janela de menu
-  self.window:draw()
+  self.window_selectable:draw()
 end
 
 return GameScene

@@ -3,10 +3,13 @@ local Tween = require('src.lib.tween')
 local NinePatchRect = require('src.utils.nine_patch_rect')
 
 --- @class Window : Object
+--- @field x number
+--- @field y number
+--- @field h number
+--- @field skin love.Texture
 local Window = Object:extend()
 
 function Window:new(x, y, w, h, skin)
-  -- Posição e tamanho
   self.x = x
   self.y = y
   self.w = w
@@ -25,20 +28,21 @@ function Window:new(x, y, w, h, skin)
   self.opening = false
   self.closing = false
 
-  -- Recursos visuais
   self.skin = skin
-  self.bg_quad = love.graphics.newQuad(0, 0, 64, 64, 128, 128)
 
-  -- Cria o patch da moldura
+  -- Background da window
+  self.background = love.graphics.newQuad(0, 0, 64, 64, 128, 128)
+
+  -- Moldura da window
   local frame_quad = love.graphics.newQuad(64, 0, 64, 64, 128, 128)
-  local frame_image = love.graphics.newCanvas(64, 64)
+  local frame = love.graphics.newCanvas(64, 64)
 
-  love.graphics.setCanvas(frame_image)
+  love.graphics.setCanvas(frame)
   love.graphics.clear()
   love.graphics.draw(self.skin, frame_quad, 0, 0)
   love.graphics.setCanvas()
 
-  self.skin_rect = NinePatchRect({ top = 8, bottom = 8, left = 8, right = 8 }, frame_image)
+  self.skin_rect = NinePatchRect({ top = 8, bottom = 8, left = 8, right = 8 }, frame)
 
   self:on_load()
 end
@@ -71,7 +75,6 @@ function Window:close()
   self.tween = Tween.new(0.2, self, { openness = 0 }, 'inQuad')
 end
 
---- @private
 function Window:get_content_area()
   return {
     x = self.x + self.horizontal_padding,
@@ -81,12 +84,10 @@ function Window:get_content_area()
   }
 end
 
---- @private
 function Window:get_content_offset()
   return self.horizontal_padding - self.ox, self.vertical_padding - self.oy
 end
 
---- @private
 function Window:get_content_size()
   return self.w - 2 * self.horizontal_padding, self.h - 2 * self.vertical_padding
 end
@@ -127,7 +128,7 @@ function Window:draw()
 
     love.graphics.setShader()
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self.skin, self.bg_quad, 0, 0, 0, self.w / 64, self.h / 64)
+    love.graphics.draw(self.skin, self.background, 0, 0, 0, self.w / 64, self.h / 64)
 
     self.skin_rect:draw(0, 0, self.w, self.h)
 
@@ -163,6 +164,7 @@ function Window:on_draw_content() end
 
 function Window:on_handle_input() end
 
+---@param dt number
 function Window:on_update(dt) end
 
 return Window

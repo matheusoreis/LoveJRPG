@@ -10,13 +10,15 @@ local WindowMenu = require("src.windows.menu_window")
 local MenuScene = SceneBase:extend()
 
 function MenuScene:on_load()
+  self:play_bgm("background.ogg")
+
   self.background = self.resource:get_title("background.png")
 
-  local w, h = 200, 3 * 20 + 16
+  local w, h = 300, 3 * 20 + 100
   local x = (love.graphics.getWidth() - w) / 2
   local y = (love.graphics.getHeight() - h) / 2
 
-  self.window = WindowMenu(x, y, w, h, self.resource:get_system("skin.png"))
+  self.window = WindowMenu(x, y, w, h, self.resource:get_system("skin.png"), self.resource, self.input, self.audio)
   self.window:open(0)
 end
 

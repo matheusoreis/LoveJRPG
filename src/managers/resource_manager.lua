@@ -39,9 +39,10 @@ function ResourceManager:get_shader(name)
 end
 
 --- @param name string
---- @param size number
+--- @param size number?
 --- @return love.Font
 function ResourceManager:get_font(name, size)
+  size = size or 14
   local path = 'graphics/fonts/' .. name
   self.fonts[path] = self.fonts[path] or {}
   return self:load_cache(self.fonts[path], size, function()

@@ -47,6 +47,7 @@ function love.load()
     Data[key] = result
   end
 
+
   scene_manager:push(MenuScene, true)
 end
 
