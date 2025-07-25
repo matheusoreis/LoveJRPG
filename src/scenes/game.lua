@@ -6,10 +6,10 @@
 local SceneBase = require('src.game.scene')
 local WindowMenu = require("src.windows.menu_window")
 
---- @class MenuScene : SceneBase
-local MenuScene = SceneBase:extend()
+--- @class GameScene : SceneBase
+local GameScene = SceneBase:extend()
 
-function MenuScene:on_load()
+function GameScene:on_load()
   self.background = self.resource:get_title("background.png")
 
   local w, h = 200, 3 * 20 + 16
@@ -20,13 +20,13 @@ function MenuScene:on_load()
   self.window:open(0)
 end
 
-function MenuScene:on_enter()
+function GameScene:on_enter()
 end
 
-function MenuScene:on_exit()
+function GameScene:on_exit()
 end
 
-function MenuScene:on_update(dt)
+function GameScene:on_update(dt)
   self.window:update(dt)
 
   if self:is_pressed("y") then
@@ -34,14 +34,9 @@ function MenuScene:on_update(dt)
   elseif self:is_pressed("x") then
     self.window:close(0.2)
   end
-
-  if self:is_pressed("b") then
-    local game_scene = require("src.scenes.game")
-    self.scene_manager:push(game_scene)
-  end
 end
 
-function MenuScene:on_draw(width, height)
+function GameScene:on_draw(width, height)
   -- Fundo em tiles
   love.graphics.setShader()
   love.graphics.setColor(1, 1, 1)
@@ -55,4 +50,4 @@ function MenuScene:on_draw(width, height)
   self.window:draw()
 end
 
-return MenuScene
+return GameScene

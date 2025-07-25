@@ -11,15 +11,17 @@ local Object = require "src.lib.classic"
 --- @field protected data DataManager
 --- @field protected audio AudioManager
 --- @field protected transition Transition
+--- @field protected scene_manager SceneManager
 --- @field private started boolean
 local SceneBase = Object:extend()
 
-function SceneBase:new(resource, input, data, audio, transition)
+function SceneBase:new(resource, input, data, audio, transition, scene_manager)
   self.resource = resource
   self.input = input
   self.data = data
   self.audio = audio
   self.transition = transition
+  self.scene_manager = scene_manager
   self.started = false
 
   self:on_load()

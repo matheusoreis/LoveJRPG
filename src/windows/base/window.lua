@@ -1,38 +1,32 @@
 local Object = require('src.lib.classic')
+local Tween = require('src.lib.tween')
 local NinePatchRect = require('src.utils.nine_patch_rect')
 
 --- @class Window : Object
 local Window = Object:extend()
 
-function Window:new(x, y, w, h, resource, input, padding_x, padding_y)
+function Window:new(x, y, w, h, skin)
   -- Posição e tamanho
   self.x = x
   self.y = y
   self.w = w
   self.h = h
 
-  -- Paddings configuráveis (default: 4)
-  self.horizontal_padding = padding_x or 4
-  self.vertical_padding = padding_y or 4
+  self.horizontal_padding = 8
+  self.vertical_padding = 8
 
-  -- Recursos
-  self.resource = resource
-  self.input = input
-
-  -- Estados
-  self.visible = true
   self.enabled = true
   self.openness = 0
 
   self.ox = 0
   self.oy = 0
 
+  self.tween = nil
   self.opening = false
   self.closing = false
-  self.open_speed = 0
 
   -- Recursos visuais
-  self.skin = self.resource:get_system("skin.png")
+  self.skin = skin
   self.bg_quad = love.graphics.newQuad(0, 0, 64, 64, 128, 128)
 
   -- Cria o patch da moldura
@@ -47,15 +41,6 @@ function Window:new(x, y, w, h, resource, input, padding_x, padding_y)
   self.skin_rect = NinePatchRect({ top = 8, bottom = 8, left = 8, right = 8 }, frame_image)
 
   self:on_load()
-end
-
---#region states
-function Window:is_visible()
-  return self.visible
-end
-
-function Window:is_enabled()
-  return self.enabled
 end
 
 function Window:is_open()
@@ -74,44 +59,19 @@ function Window:is_closing()
   return self.closing
 end
 
-function Window:set_visible(visible)
-  self.visible = visible
-end
-
-function Window:set_enabled(enabled)
-  self.enabled = enabled
-end
-
---#endregion
-
--- Abertura / Fechamento
-
-function Window:open(duration)
-  duration = duration or 4
-  if duration > 0 then
-    self.open_speed = 1 / duration
-  else
-    self.openness = 1
-    self.open_speed = 0
-  end
-  self.opening = not self:is_open()
+function Window:open()
+  self.opening = true
   self.closing = false
+  self.tween = Tween.new(0.2, self, { openness = 1 }, 'outQuad')
 end
 
-function Window:close(duration)
-  duration = duration or 4
-  if duration > 0 then
-    self.open_speed = 1 / duration
-  else
-    self.openness = 0
-    self.open_speed = 0
-  end
+function Window:close()
+  self.closing = true
   self.opening = false
-  self.closing = not self:is_closed()
+  self.tween = Tween.new(0.2, self, { openness = 0 }, 'inQuad')
 end
 
--- Área de conteúdo
-
+--- @private
 function Window:get_content_area()
   return {
     x = self.x + self.horizontal_padding,
@@ -121,62 +81,44 @@ function Window:get_content_area()
   }
 end
 
+--- @private
 function Window:get_content_offset()
   return self.horizontal_padding - self.ox, self.vertical_padding - self.oy
 end
 
+--- @private
 function Window:get_content_size()
   return self.w - 2 * self.horizontal_padding, self.h - 2 * self.vertical_padding
 end
 
--- Métodos de override
-
-function Window:on_load()
-end
-
-function Window:draw_interface()
-end
-
-function Window:draw_content()
-end
-
-function Window:handle_input()
-end
-
-function Window:on_update(dt)
-end
-
+--- @private
 function Window:update(dt)
-  if self.opening then
-    local old = self.openness
-    self.openness = math.min(1, self.openness + self.open_speed * dt)
-    print(("Abrindo: %.2f -> %.2f"):format(old, self.openness))
-    if self:is_open() then
-      self.opening = false
-      print("Janela totalmente aberta!")
-    end
-  elseif self.closing then
-    local old = self.openness
-    self.openness = math.max(0, self.openness - self.open_speed * dt)
-    print(("Fechando: %.2f -> %.2f"):format(old, self.openness))
-    if self:is_closed() then
-      self.closing = false
-      print("Janela totalmente fechada!")
+  if self.tween then
+    local complete = self.tween:update(dt)
+    if complete then
+      if self.opening and self:is_open() then
+        self.opening = false
+        self.enabled = true
+        self.tween = nil
+        print("Janela totalmente aberta!")
+      elseif self.closing and self:is_closed() then
+        self.closing = false
+        self.enabled = false
+        self.tween = nil
+        print("Janela totalmente fechada!")
+      end
     end
   end
 
   if self.enabled and self:is_open() then
-    self:handle_input()
+    self:on_handle_input()
   end
 
   self:on_update(dt)
 end
 
--- Desenho
-
+--- @private
 function Window:draw()
-  if not self.visible then return end
-
   if not self:is_closed() then
     love.graphics.push()
     love.graphics.translate(self.x, self.y + self.h / 2)
@@ -196,7 +138,7 @@ function Window:draw()
     love.graphics.push()
     love.graphics.translate(self.x, self.y)
 
-    self:draw_interface()
+    self:on_draw_interface()
 
     love.graphics.push()
     local offset_x, offset_y = self:get_content_offset()
@@ -205,12 +147,22 @@ function Window:draw()
     local content = self:get_content_area()
     love.graphics.setScissor(content.x, content.y, content.w, content.h)
 
-    self:draw_content()
+    self:on_draw_content()
 
     love.graphics.setScissor()
     love.graphics.pop()
     love.graphics.pop()
   end
 end
+
+function Window:on_load() end
+
+function Window:on_draw_interface() end
+
+function Window:on_draw_content() end
+
+function Window:on_handle_input() end
+
+function Window:on_update(dt) end
 
 return Window

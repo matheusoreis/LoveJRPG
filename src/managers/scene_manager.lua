@@ -20,6 +20,7 @@ function SceneManager:new(resource, input, data, audio, transition)
   self.input = input
   self.data = data
   self.audio = audio
+
   self.transition = transition
 end
 
@@ -38,7 +39,7 @@ function SceneManager:push(state_class, clear, ...)
     self.stack = {}
   end
 
-  local state_instance = state_class(self.resource, self.input, self.data, self.audio, self.transition, ...)
+  local state_instance = state_class(self.resource, self.input, self.data, self.audio, self.transition, self, ...)
   table.insert(self.stack, state_instance)
 end
 
