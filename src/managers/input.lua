@@ -2,6 +2,11 @@ local Object = require('src.shared.object')
 local Events = require('src.shared.events')
 
 ---@class InputManager : Object
+---@field keymap table
+---@field private held table
+---@field private pressed_once table
+---@field private released_once table
+---@field private axes table
 local InputManager = Object:extend()
 
 function InputManager:new()
@@ -23,39 +28,39 @@ function InputManager:new()
     back  = { "escape", "gamepad:back" }
   }
 
-  self._held = {}
-  self._pressed_once = {}
-  self._released_once = {}
-  self._axes = {}
+  self.held = {}
+  self.pressed_once = {}
+  self.released_once = {}
+  self.axes = {}
 
   Events:on_event("key_pressed", function(key)
-    if not self._held[key] then
-      self._pressed_once[key] = true
+    if not self.held[key] then
+      self.pressed_once[key] = true
     end
-    self._held[key] = true
+    self.held[key] = true
   end)
 
   Events:on_event("key_released", function(key)
-    self._held[key] = false
-    self._released_once[key] = true
+    self.held[key] = false
+    self.released_once[key] = true
   end)
 
   Events:on_event("gamepad_pressed", function(_, button)
     local key = "gamepad:" .. button
-    if not self._held[key] then
-      self._pressed_once[key] = true
+    if not self.held[key] then
+      self.pressed_once[key] = true
     end
-    self._held[key] = true
+    self.held[key] = true
   end)
 
   Events:on_event("gamepad_released", function(_, button)
     local key = "gamepad:" .. button
-    self._held[key] = false
-    self._released_once[key] = true
+    self.held[key] = false
+    self.released_once[key] = true
   end)
 
   Events:on_event("gamepad_axis", function(_, axis, value)
-    self._axes["gamepad:" .. axis] = value
+    self.axes["gamepad:" .. axis] = value
   end)
 
   Events:on_event("joystick_axis", function(joystick, axis, value)
@@ -68,14 +73,16 @@ function InputManager:new()
     local axis_name = axis_map[axis]
 
     if axis_name then
-      self._axes["gamepad:" .. axis_name] = value
+      self.axes["gamepad:" .. axis_name] = value
     end
   end)
 end
 
+local input_manager = InputManager()
+
 function InputManager:update()
-  self._pressed_once = {}
-  self._released_once = {}
+  self.pressed_once = {}
+  self.released_once = {}
 end
 
 --- Verifica se a ação está segurada (tecla, botão ou eixo)
@@ -87,23 +94,23 @@ function InputManager:is_action_held(action)
 
   for _, key in ipairs(keys) do
     if key == "gamepad:leftx-" then
-      if (self._axes["gamepad:leftx"] or 0) < -0.5 then return true end
+      if (self.axes["gamepad:leftx"] or 0) < -0.5 then return true end
     elseif key == "gamepad:leftx+" then
-      if (self._axes["gamepad:leftx"] or 0) > 0.5 then return true end
+      if (self.axes["gamepad:leftx"] or 0) > 0.5 then return true end
     elseif key == "gamepad:lefty-" then
-      if (self._axes["gamepad:lefty"] or 0) < -0.5 then return true end
+      if (self.axes["gamepad:lefty"] or 0) < -0.5 then return true end
     elseif key == "gamepad:lefty+" then
-      if (self._axes["gamepad:lefty"] or 0) > 0.5 then return true end
+      if (self.axes["gamepad:lefty"] or 0) > 0.5 then return true end
     elseif key == "gamepad:rightx-" then
-      if (self._axes["gamepad:rightx"] or 0) < -0.5 then return true end
+      if (self.axes["gamepad:rightx"] or 0) < -0.5 then return true end
     elseif key == "gamepad:rightx+" then
-      if (self._axes["gamepad:rightx"] or 0) > 0.5 then return true end
+      if (self.axes["gamepad:rightx"] or 0) > 0.5 then return true end
     elseif key == "gamepad:righty-" then
-      if (self._axes["gamepad:righty"] or 0) < -0.5 then return true end
+      if (self.axes["gamepad:righty"] or 0) < -0.5 then return true end
     elseif key == "gamepad:righty+" then
-      if (self._axes["gamepad:righty"] or 0) > 0.5 then return true end
+      if (self.axes["gamepad:righty"] or 0) > 0.5 then return true end
     else
-      if self._held[key] then return true end
+      if self.held[key] then return true end
     end
   end
 
@@ -118,7 +125,7 @@ function InputManager:is_action_pressed(action)
   if not keys then return false end
 
   for _, key in ipairs(keys) do
-    if self._pressed_once[key] then
+    if self.pressed_once[key] then
       return true
     end
   end
@@ -134,7 +141,7 @@ function InputManager:is_action_released(action)
   if not keys then return false end
 
   for _, key in ipairs(keys) do
-    if self._released_once[key] then
+    if self.released_once[key] then
       return true
     end
   end
@@ -142,5 +149,4 @@ function InputManager:is_action_released(action)
   return false
 end
 
-local input_manager = InputManager()
 return input_manager
