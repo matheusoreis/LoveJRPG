@@ -8,7 +8,11 @@ require('src.shared.events')
 
 
 local Config = require('src.config')
+
+---@type InputManager
 local Input = require('src.managers.input')
+---@type DataManager
+local Data = require('src.managers.data')
 
 function love.load()
   local title = Config.title
@@ -23,7 +27,7 @@ function love.load()
   local mouse_visibility = Config.mouse_visibility
 
   -- Configura o título da janela.
-  love.window.setTitle(title .. " " .. version)
+  love.window.setTitle(title .. ' ' .. version)
   -- Configura o modo da janela.
   love.window.setMode(screenWidth, screenHeight, {
     minwidth = minWidth,
@@ -33,9 +37,19 @@ function love.load()
     vsync = vsync,
   })
   -- Configura o filtro das texturas
-  love.graphics.setDefaultFilter("nearest", "nearest")
+  love.graphics.setDefaultFilter('nearest', 'nearest')
   -- Configura a visibilidade do mouse
   love.mouse.setVisible(mouse_visibility)
+
+  local data_files = { 'actors', 'animations', 'effects', 'enemies', 'groups', 'items', 'skills' }
+  for _, filename in ipairs(data_files) do
+    local loaded = Data:load(filename)
+    if loaded == nil then
+      return
+    end
+
+    print("Dado carregado com sucesso: " .. filename)
+  end
 end
 
 function love.update(dt)
