@@ -7,22 +7,22 @@
 -- Mit License
 
 return {
-  title = "Love RPG",
+  title = "Love JRPG",
   author = "Matheus Oliveira",
   version = "1.0.0",
 
-  screenWidth = 800,
-  screenHeight = 600,
-  minWidth = 400,
-  minHeight = 300,
+  screen_width = 1366,
+  screen_height = 768,
+  min_width = 800,
+  min_height = 600,
   fullscreen = false,
-  vsync = false,
+  vsync = true,
   resizable = false,
+  mouse_visibility = false,
 
-  startScene = "login",
+  tile_size = 32,
+  show_collisions = true,
 
-  tileSize = 32,
-  showCollisions = true,
-  graphicsFormats = { "png", "jpg", "jpeg", "bmp", "tga" },
-  audioFormats = { "ogg", "wav", "mp3", "flac", "mod", "xm", "s3m", "it" },
+  graphics_formats = { "png", "jpg", "jpeg", "bmp", "tga" },
+  audio_formats = { "ogg", "wav", "mp3", "flac", "mod", "xm", "s3m", "it" },
 }
