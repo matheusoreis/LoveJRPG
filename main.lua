@@ -9,14 +9,12 @@ require('src.shared.events')
 
 local Config = require('src.config')
 
----@type InputManager
-local Input = require('src.managers.input')
 ---@type DataManager
 local Data = require('src.managers.data')
----@type ResourceManager
-local Resource = require('src.managers.resource')
 ---@type AudioManager
 local Audio = require('src.managers.audio')
+---@type SceneManager
+local Scene = require('src.managers.scene')()
 
 function love.load()
   local title = Config.title
@@ -58,11 +56,18 @@ function love.load()
 
   -- Carrega os arquivos de áudios
   Audio:load()
+
+  -- Inicializa a scene principal
+  Scene:push(require('src.scenes.menu'))
 end
 
 function love.update(dt)
-  Input:update()
+  Scene:update(dt)
 end
 
 function love.draw()
+  local width = love.graphics.getWidth()
+  local height = love.graphics.getHeight()
+
+  Scene:draw(width, height)
 end

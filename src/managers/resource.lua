@@ -126,7 +126,7 @@ end
 
 --- Retorna imagem de título.
 ---@param name string Nome do arquivo
-function ResourceManager:titles(name)
+function ResourceManager:get_title(name)
   return self:get_image('titles', name)
 end
 

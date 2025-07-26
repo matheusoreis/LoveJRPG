@@ -11,8 +11,8 @@ return {
   author = "Matheus Oliveira",
   version = "1.0.0",
 
-  screen_width = 1366,
-  screen_height = 768,
+  screen_width = 800,
+  screen_height = 600,
   min_width = 800,
   min_height = 600,
   fullscreen = false,
