@@ -13,6 +13,8 @@ local Config = require('src.config')
 local Input = require('src.managers.input')
 ---@type DataManager
 local Data = require('src.managers.data')
+---@type ResourceManager
+local Resource = require('src.managers.resource')
 
 function love.load()
   local title = Config.title
