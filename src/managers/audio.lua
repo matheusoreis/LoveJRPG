@@ -20,7 +20,7 @@ local audio_manager = AudioManager()
 ---@param file string
 ---@return boolean
 function AudioManager:is_audio_file(file)
-  local audio_formats = { "ogg", "wav", "mp3", "flac", "mod", "xm", "s3m", "it" }
+  local audio_formats = { "ogg", "wav", "mp3" }
   for _, ext in ipairs(audio_formats) do
     if file:match("%." .. ext .. "$") then
       return true
