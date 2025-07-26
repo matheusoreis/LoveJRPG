@@ -30,7 +30,7 @@ function OptionsScene:on_draw(width, height)
 end
 
 function OptionsScene:on_exit()
-
+  print('Saindo da OptionsWindow...')
 end
 
 return OptionsScene

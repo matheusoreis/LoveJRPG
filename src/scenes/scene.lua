@@ -10,6 +10,7 @@ local Resource = require('src.managers.resource')
 ---@field input InputManager
 ---@field resource ResourceManager
 ---@field scene SceneManager
+---@field windows table<string, WindowBase>
 local SceneBase = Object:extend()
 
 --- @protected
@@ -25,33 +26,60 @@ function SceneBase:new(scene_manager)
   self:on_load()
 end
 
----@virtual
 function SceneBase:on_load()
 end
 
----@virtual
 function SceneBase:on_enter()
+end
+
+function SceneBase:add_window(name, window)
+  self.windows[name] = window
+end
+
+function SceneBase:remove_window(name)
+  self.windows[name] = nil
+end
+
+function SceneBase:open_window(name)
+  local window = self.windows[name]
+  if window then
+    window:open()
+  end
+end
+
+function SceneBase:close_window(name)
+  local window = self.windows[name]
+  if window then
+    window:close()
+  end
 end
 
 --- @protected
 function SceneBase:update(dt)
   self:on_update(dt)
+
+  for _, window in pairs(self.windows) do
+    ---@diagnostic disable-next-line: invisible
+    window:update(dt)
+  end
 end
 
----@virtual
 function SceneBase:on_update(dt)
 end
 
 --- @protected
 function SceneBase:draw(width, height)
   self:on_draw(width, height)
+
+  for _, window in pairs(self.windows) do
+    ---@diagnostic disable-next-line: invisible
+    window:draw()
+  end
 end
 
----@virtual
 function SceneBase:on_draw(width, height)
 end
 
----@virtual
 function SceneBase:on_exit()
 end
 

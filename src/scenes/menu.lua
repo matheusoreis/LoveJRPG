@@ -9,25 +9,26 @@ function MenuScene:on_load()
   print('Carregando a MenuScene...')
 
   self.background = self.resource:get_title('background')
-  self.title_window = TitleWindow(20, 20, 500, 50)
+
+  local title_window = TitleWindow(20, 20, 500, 50)
+  self:add_window("title", title_window)
 end
 
 function MenuScene:on_enter()
   print('Entrando na MenuScene...')
+
+  self:open_window("title")
 end
 
 function MenuScene:on_update(dt)
-  ---@diagnostic disable-next-line: invisible
-  self.title_window:update(dt)
-
   if self.input:is_action_pressed("down") then
     print("Fechando a janela...")
-    self.title_window:close()
+    self:close_window("title")
   end
 
   if self.input:is_action_pressed("up") then
     print("Abrindo a janela...")
-    self.title_window:open()
+    self:open_window("title")
   end
 
   if self.input:is_action_pressed('start') then
@@ -43,13 +44,9 @@ function MenuScene:on_draw(width, height)
       love.graphics.draw(self.background, x * 32, y * 32)
     end
   end
-
-  ---@diagnostic disable-next-line: invisible
-  self.title_window:draw()
 end
 
 function MenuScene:on_exit()
-
 end
 
 return MenuScene

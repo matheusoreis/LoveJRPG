@@ -24,7 +24,7 @@ function SceneManager:count()
   return #self.stack
 end
 
---- Empilha uma nova cena (como Navigator.push)
+--- Empilha uma nova cena
 ---@param scene_class any
 function SceneManager:push(scene_class)
   local new_scene = scene_class(self)
@@ -32,7 +32,7 @@ function SceneManager:push(scene_class)
   self:switch_to(new_scene)
 end
 
---- Remove a cena atual e volta para a anterior (como Navigator.pop)
+--- Remove a cena atual e volta para a anterior
 function SceneManager:pop()
   if #self.stack <= 1 then
     return
@@ -43,7 +43,7 @@ function SceneManager:pop()
   self:switch_to(top)
 end
 
---- Substitui a cena atual por outra (como pushReplacement)
+--- Substitui a cena atual por outra
 ---@param scene_class any
 function SceneManager:replace(scene_class)
   local current = self.stack[#self.stack]
@@ -58,7 +58,7 @@ function SceneManager:replace(scene_class)
   self:push(scene_class)
 end
 
---- Limpa toda a pilha e empilha uma nova cena (como pushAndRemoveUntil)
+--- Limpa toda a pilha e empilha uma nova cena
 ---@param scene_class any
 function SceneManager:clear_and_push(scene_class)
   self.stack = {}
