@@ -8,6 +8,7 @@ require('src.shared.events')
 
 
 local Config = require('src.config')
+local Input = require('src.managers.input')
 
 function love.load()
   local title = Config.title
@@ -38,6 +39,7 @@ function love.load()
 end
 
 function love.update(dt)
+  Input:update()
 end
 
 function love.draw()

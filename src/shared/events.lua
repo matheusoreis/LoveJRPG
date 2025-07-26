@@ -13,6 +13,7 @@ function Events:new()
     'mouse_moved', 'mouse_pressed', 'mouse_released', 'wheel_moved',
     'joystick_pressed', 'joystick_released',
     'joystick_added', 'joystick_removed',
+    'joystick_axis',
     'gamepad_pressed', 'gamepad_released'
   )
 end
@@ -87,6 +88,10 @@ end
 
 function love.joystickremoved(joystick)
   events:emit_event('joystick_removed', joystick)
+end
+
+function love.joystickaxis(joystick, axis, value)
+  events:emit_event('joystick_axis', joystick, axis, value)
 end
 
 function love.gamepadpressed(gamepad, button)
