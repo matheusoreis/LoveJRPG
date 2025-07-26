@@ -15,6 +15,8 @@ local Input = require('src.managers.input')
 local Data = require('src.managers.data')
 ---@type ResourceManager
 local Resource = require('src.managers.resource')
+---@type AudioManager
+local Audio = require('src.managers.audio')
 
 function love.load()
   local title = Config.title
@@ -43,6 +45,7 @@ function love.load()
   -- Configura a visibilidade do mouse
   love.mouse.setVisible(mouse_visibility)
 
+  -- Carrega todos os dados do jogo
   local data_files = { 'actors', 'animations', 'effects', 'enemies', 'groups', 'items', 'skills' }
   for _, filename in ipairs(data_files) do
     local loaded = Data:load(filename)
@@ -52,6 +55,9 @@ function love.load()
 
     print("Dado carregado com sucesso: " .. filename)
   end
+
+  -- Carrega os arquivos de áudios
+  Audio:load()
 end
 
 function love.update(dt)

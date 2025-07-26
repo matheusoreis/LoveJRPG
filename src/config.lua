@@ -23,5 +23,5 @@ return {
   tile_size = 32,
   show_collisions = true,
 
-  audio_formats = { "ogg", "wav", "mp3", "flac", "mod", "xm", "s3m", "it" },
+
 }
