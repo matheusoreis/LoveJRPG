@@ -8,6 +8,7 @@
 --
 
 --- @class Object
+--- @field super any
 local Object = {}
 Object.__index = Object
 

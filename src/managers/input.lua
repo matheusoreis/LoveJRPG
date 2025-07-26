@@ -1,28 +1,25 @@
---
--- Author: Matheus R. Oliveira
--- Github: matheusoreis
---
+local Object = require('src.shared.object')
+local Events = require('src.shared.events')
 
-local Object = require('src.lib.classic')
+---@class InputManager : Object
+---@field keymap table
+---@field private held table
+---@field private pressed_once table
+---@field private released_once table
+---@field private axes table
+local InputManager = Object:extend()
 
---- @class Input : Object
---- @field private keymap table<string, string[]>
---- @field private pressed table<string, boolean>
---- @field private released table<string, boolean>
---- @field private down table<string, boolean>
-local Input = Object:extend()
-
-function Input:new()
+function InputManager:new()
   self.keymap = {
     a     = { "s", "gamepad:a" },
     b     = { "d", "gamepad:b" },
     x     = { "a", "gamepad:x" },
     y     = { "w", "gamepad:y" },
 
-    left  = { "left", "gamepad:dpleft", "gamepad:leftx-" },
-    up    = { "up", "gamepad:dpup", "gamepad:lefty-" },
-    right = { "right", "gamepad:dpright", "gamepad:leftx+" },
-    down  = { "down", "gamepad:dpdown", "gamepad:lefty+" },
+    left  = { "left", "gamepad:dpleft", "gamepad:leftx-", "gamepad:rightx-" },
+    up    = { "up", "gamepad:dpup", "gamepad:lefty-", "gamepad:righty-" },
+    right = { "right", "gamepad:dpright", "gamepad:leftx+", "gamepad:rightx+" },
+    down  = { "down", "gamepad:dpdown", "gamepad:lefty+", "gamepad:righty+" },
 
     lb    = { "q", "gamepad:leftshoulder" },
     rb    = { "e", "gamepad:rightshoulder" },
@@ -31,107 +28,126 @@ function Input:new()
     back  = { "escape", "gamepad:back" }
   }
 
-  self.pressed = {}
-  self.released = {}
-  self.down = {}
+  self.held = {}
+  self.pressed_once = {}
+  self.released_once = {}
+  self.axes = {}
+
+  Events:on_event("key_pressed", function(key)
+    if not self.held[key] then
+      self.pressed_once[key] = true
+    end
+    self.held[key] = true
+  end)
+
+  Events:on_event("key_released", function(key)
+    self.held[key] = false
+    self.released_once[key] = true
+  end)
+
+  Events:on_event("gamepad_pressed", function(_, button)
+    local key = "gamepad:" .. button
+    if not self.held[key] then
+      self.pressed_once[key] = true
+    end
+    self.held[key] = true
+  end)
+
+  Events:on_event("gamepad_released", function(_, button)
+    local key = "gamepad:" .. button
+    self.held[key] = false
+    self.released_once[key] = true
+  end)
+
+  Events:on_event("gamepad_axis", function(_, axis, value)
+    self.axes["gamepad:" .. axis] = value
+  end)
+
+  Events:on_event("joystick_axis", function(joystick, axis, value)
+    local axis_map = {
+      [1] = "leftx",
+      [2] = "lefty",
+      [3] = "rightx",
+      [4] = "righty",
+    }
+    local axis_name = axis_map[axis]
+
+    if axis_name then
+      self.axes["gamepad:" .. axis_name] = value
+    end
+  end)
 end
 
---- Chamado quando uma tecla for pressionada.
---- @param key string
-function Input:key_pressed(key)
-  -- Encontra todos os símbolos associados a esta tecla
-  for symbol, keys in pairs(self.keymap) do
-    for _, mapped_key in ipairs(keys) do
-      if mapped_key == key then
-        self.pressed[symbol] = true
-        self.down[symbol] = true
-      end
+---@type InputManager
+local input_manager = InputManager()
+
+function InputManager:update()
+  self.pressed_once = {}
+  self.released_once = {}
+end
+
+--- Verifica se a ação está segurada (tecla, botão ou eixo)
+---@param action string
+---@return boolean
+function InputManager:is_action_held(action)
+  local keys = self.keymap[action]
+  if not keys then return false end
+
+  for _, key in ipairs(keys) do
+    if key == "gamepad:leftx-" then
+      if (self.axes["gamepad:leftx"] or 0) < -0.5 then return true end
+    elseif key == "gamepad:leftx+" then
+      if (self.axes["gamepad:leftx"] or 0) > 0.5 then return true end
+    elseif key == "gamepad:lefty-" then
+      if (self.axes["gamepad:lefty"] or 0) < -0.5 then return true end
+    elseif key == "gamepad:lefty+" then
+      if (self.axes["gamepad:lefty"] or 0) > 0.5 then return true end
+    elseif key == "gamepad:rightx-" then
+      if (self.axes["gamepad:rightx"] or 0) < -0.5 then return true end
+    elseif key == "gamepad:rightx+" then
+      if (self.axes["gamepad:rightx"] or 0) > 0.5 then return true end
+    elseif key == "gamepad:righty-" then
+      if (self.axes["gamepad:righty"] or 0) < -0.5 then return true end
+    elseif key == "gamepad:righty+" then
+      if (self.axes["gamepad:righty"] or 0) > 0.5 then return true end
+    else
+      if self.held[key] then return true end
     end
   end
+
+  return false
 end
 
---- Chamado quando uma tecla for solta
---- @param key string
-function Input:key_released(key)
-  -- Encontra todos os símbolos associados a esta tecla
-  for symbol, keys in pairs(self.keymap) do
-    for _, mapped_key in ipairs(keys) do
-      if mapped_key == key then
-        self.released[symbol] = true
-        self.down[symbol] = false
-      end
+--- Verifica se a ação foi clicada neste frame (clique único)
+---@param action string
+---@return boolean
+function InputManager:is_action_pressed(action)
+  local keys = self.keymap[action]
+  if not keys then return false end
+
+  for _, key in ipairs(keys) do
+    if self.pressed_once[key] then
+      return true
     end
   end
+
+  return false
 end
 
---- Chamado quando um botão de gamepad for pressionado
---- @param button string
-function Input:gamepad_pressed(button)
-  local key = "gamepad:" .. button
-  self:key_pressed(key)
-end
+--- Verifica se a ação foi liberada neste frame (clique único de soltura)
+---@param action string
+---@return boolean
+function InputManager:is_action_released(action)
+  local keys = self.keymap[action]
+  if not keys then return false end
 
---- Chamado quando um botão de gamepad for solto
---- @param button string
-function Input:gamepad_released(button)
-  local key = "gamepad:" .. button
-  self:key_released(key)
-end
-
---- Atualiza os estados de direção do analógico esquerdo do joystick.
---- @param joystick love.Joystick
-function Input:update_gamepad_axes(joystick)
-  local deadzone = 0.3
-
-  local x = joystick:getGamepadAxis("leftx")
-  local y = joystick:getGamepadAxis("lefty")
-
-  -- Reseta estados anteriores
-  self.down["gamepad:leftx+"] = false
-  self.down["gamepad:leftx-"] = false
-  self.down["gamepad:lefty+"] = false
-  self.down["gamepad:lefty-"] = false
-
-  if x > deadzone then
-    self.down["gamepad:leftx+"] = true
-  elseif x < -deadzone then
-    self.down["gamepad:leftx-"] = true
+  for _, key in ipairs(keys) do
+    if self.released_once[key] then
+      return true
+    end
   end
 
-  if y > deadzone then
-    self.down["gamepad:lefty+"] = true
-  elseif y < -deadzone then
-    self.down["gamepad:lefty-"] = true
-  end
+  return false
 end
 
---- @private
---- Verifica se um símbolo foi pressionado neste frame
---- @param symbol string
---- @return boolean
-function Input:is_pressed(symbol)
-  return self.pressed[symbol] == true
-end
-
---- Verifica se um símbolo foi liberado neste frame
---- @param symbol string
---- @return boolean
-function Input:is_released(symbol)
-  return self.released[symbol] == true
-end
-
---- Verifica se um símbolo está sendo mantido
---- @param symbol string
---- @return boolean
-function Input:is_down(symbol)
-  return self.down[symbol] == true
-end
-
---- Atualiza o estado de entrada
-function Input:update()
-  -- Limpa os estados temporários do frame
-  self.pressed = {}
-  self.released = {}
-end
-
-return Input
+return input_manager

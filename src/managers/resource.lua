@@ -1,114 +1,134 @@
---
--- Author: Matheus R. Oliveira
--- Github: matheusoreis
---
+local Object = require('src.shared.object')
 
-local Object = require('src.lib.classic')
+---@class ResourceManager : Object
+---@field private shaders table<string, love.Shader>
+---@field private fonts table<string, love.Font>
+---@field private images table<string, love.Image>
+local ResourceManager = Object:extend()
 
---- @class Resource : Object
---- @field private shaders table<string, love.Shader>
---- @field private fonts table<string, table<number, love.Font>>
---- @field private images table<string, love.Image>
-local Resource = Object:extend()
-
-function Resource:new()
+function ResourceManager:new()
   self.shaders = {}
   self.fonts = {}
   self.images = {}
 end
 
----@private
---- Carrega um recurso do cache ou o cria se não existir
---- @param cache table
---- @param key any
---- @param loader function
-function Resource:load_cache(cache, key, loader)
-  if not cache[key] then
-    cache[key] = loader()
+---@type ResourceManager
+local resource_manager = ResourceManager()
+
+--- Armazena um recurso em cache se ainda não estiver presente.
+---@param store table Armazenamento (shaders, fonts, images)
+---@param key string Chave de identificação
+---@param data any Valor a ser armazenado
+function ResourceManager:cache(store, key, data)
+  if not store[key] and data ~= nil then
+    store[key] = data
   end
 
-  return cache[key]
+  return store[key]
 end
 
---- Carrega um shader
---- @param name string
---- @return love.Shader
-function Resource:load_shader(name)
-  local path = 'graphics/shaders/' .. name
-  return self:load_cache(self.shaders, path, function()
-    return love.graphics.newShader(path)
-  end)
+--- Retorna um shader carregado.
+---@param name string Nome do shader
+function ResourceManager:get_shader(name)
+  if self.shaders[name] then
+    return self.shaders[name]
+  end
+
+  local path = 'graphics/shaders/' .. name .. '.glsl'
+  if not love.filesystem.getInfo(path) then
+    print("Erro: shader não encontrado: " .. path)
+    return nil
+  end
+
+  local code = love.filesystem.read(path)
+  if not code then
+    print("Erro: falha ao ler shader: " .. path)
+    return nil
+  end
+
+  local shader = love.graphics.newShader(code)
+  return self:cache(self.shaders, name, shader)
 end
 
---- Carrega uma fonte
---- @param name string
---- @param size number
---- @return love.Font
-function Resource:load_font(name, size)
-  local path = 'graphics/fonts/' .. name
-  self.fonts[path] = self.fonts[path] or {}
-  return self:load_cache(self.fonts[path], size, function()
-    return love.graphics.newFont(path, size)
-  end)
+--- Retorna uma fonte carregada.
+---@param name string Nome do arquivo de fonte (sem extensão)
+---@param size number Tamanho da fonte
+function ResourceManager:get_font(name, size)
+  local key = name
+
+  if self.fonts[key] then
+    return self.fonts[key]
+  end
+
+  local path = 'graphics/fonts/' .. name .. '.ttf'
+  if not love.filesystem.getInfo(path) then
+    print("Erro: fonte não encontrada: " .. path)
+    return nil
+  end
+
+  local font = love.graphics.newFont(path, size)
+  return self:cache(self.fonts, key, font)
 end
 
----@private
---- Carrega uma imagem
---- @param path string
---- @return love.Image
-function Resource:load_image(path)
-  return self:load_cache(self.images, path, function()
-    return love.graphics.newImage(path)
-  end)
+--- Carrega e retorna uma imagem por categoria.
+---@param category string Subpasta em graphics/
+---@param name string Nome do arquivo de imagem
+function ResourceManager:get_image(category, name)
+  local path = 'graphics/' .. category .. '/' .. name .. '.png'
+
+  if not self.images[name] then
+    if love.filesystem.getInfo(path) then
+      local image = love.graphics.newImage(path)
+      return self:cache(self.images, name, image)
+    else
+      print("Erro: imagem não encontrada: " .. path)
+      return nil
+    end
+  end
+
+  return self.images[name]
 end
 
---- Carrega um sprite de ator
---- @param name string
---- @return love.Image
-function Resource:load_actor(name)
-  return self:load_image('graphics/actors/' .. name)
+--- Retorna imagem de ator.
+---@param name string Nome do arquivo
+function ResourceManager:get_actor(name)
+  return self:get_image('actors', name)
 end
 
---- Carrega um sprite de animação
---- @param name string
---- @return love.Image
-function Resource:load_animation(name)
-  return self:load_image('graphics/animations/' .. name)
+--- Retorna imagem de animação.
+---@param name string Nome do arquivo
+function ResourceManager:get_animation(name)
+  return self:get_image('animations', name)
 end
 
---- Carrega uma imagem de fundo
---- @param name string
---- @return love.Image
-function Resource:load_background(name)
-  return self:load_image('graphics/backgrounds/' .. name)
+--- Retorna imagem de fundo.
+---@param name string Nome do arquivo
+function ResourceManager:get_background(name)
+  return self:get_image('backgrounds', name)
 end
 
---- Carrega um sprite de inimigo
---- @param name string
---- @return love.Image
-function Resource:load_enemy(name)
-  return self:load_image('graphics/enemies/' .. name)
+--- Retorna imagem de inimigo.
+---@param name string Nome do arquivo
+function ResourceManager:get_enemy(name)
+  return self:get_image('enemies', name)
 end
 
---- Carrega uma imagem do sistema
---- @param name string
---- @return love.Image
-function Resource:load_system(name)
-  return self:load_image('graphics/system/' .. name)
+--- Retorna imagem do sistema.
+---@param name string Nome do arquivo
+function ResourceManager:get_system(name)
+  return self:get_image('system', name)
 end
 
---- Carrega um tileset
---- @param name string
---- @return love.Image
-function Resource:load_tileset(name)
-  return self:load_image('graphics/tilesets/' .. name)
+--- Retorna imagem de tileset.
+---@param name string Nome do arquivo
+function ResourceManager:get_tileset(name)
+  return self:get_image('tilesets', name)
 end
 
---- Carrega uma imagem de título
---- @param name string
---- @return love.Image
-function Resource:load_title(name)
-  return self:load_image('graphics/titles/' .. name)
+--- Retorna imagem de título.
+---@param name string Nome do arquivo
+function ResourceManager:get_title(name)
+  return self:get_image('titles', name)
 end
 
-return Resource
+return resource_manager

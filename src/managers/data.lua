@@ -1,77 +1,48 @@
---
--- Author: Matheus R. Oliveira
--- Github: matheusoreis
---
+local Object = require('src.shared.object')
+local Json = require('src.shared.json')
 
-local Object = require('src.lib.classic')
-local json = require('src.lib.json')
+---@class DataManager : Object
+---@field data table Tabela dos dados carregados
+---@field private path string Caminho padrão dos dados
+local DataManager = Object:extend()
 
---- @class Data : Object
---- @field private save_path string Caminho base para salvar os arquivos
-local Data = Object:extend()
+function DataManager:new()
+  self.data = {}
 
-function Data:new()
-  -- Define o diretório base para salvar os arquivos
-  self.save_path = "data/"
-
-  -- Garante que o diretório de saves existe
-  if not love.filesystem.getInfo(self.save_path) then
-    love.filesystem.createDirectory(self.save_path)
+  self.path = 'data/'
+  if not love.filesystem.getInfo(self.path) then
+    return
   end
 end
 
---- Salva dados em um arquivo JSON
---- @param name string Nome do arquivo (sem extensão)
---- @param data table Dados a serem salvos
---- @return boolean success
---- @return string? error
-function Data:save(name, data)
-  if type(data) ~= "table" then
-    return false, "Dados inválidos: esperava uma tabela"
-  end
+---@type DataManager
+local data_manager = DataManager()
 
-  local filename = self.save_path .. name .. ".json"
+--- Carrega os dados do jogo do arquivo informado.
+---@param name string Nome do arquivo
+---@return table|nil Dados carregados ou nil em caso de erro
+function DataManager:load(name)
+  local filename = self.path .. name .. '.json'
 
-  -- Codifica os dados em JSON
-  local encoded_data = json.encode(data)
-  if not encoded_data then
-    return false, "Erro ao codificar JSON"
-  end
-
-  -- Tenta salvar o arquivo
-  local success, error = love.filesystem.write(filename, encoded_data)
-  if not success then
-    return false, "Erro ao salvar arquivo: " .. error
-  end
-
-  return true
-end
-
---- Carrega dados de um arquivo JSON
---- @param name string Nome do arquivo (sem extensão)
---- @return table|nil data
---- @return string? error
-function Data:load(name)
-  local filename = self.save_path .. name .. ".json"
-
-  -- Verifica se o arquivo existe
   if not love.filesystem.getInfo(filename) then
-    return nil, "Arquivo não encontrado: " .. filename
+    print('Arquivo não encontrado: ' .. filename)
+    return nil
   end
 
-  -- Lê o arquivo
   local content = love.filesystem.read(filename)
   if not content then
-    return nil, "Erro ao ler arquivo"
+    print('Erro ao ler arquivo.')
+    return nil
   end
 
-  -- Decodifica o JSON
-  local decoded_data = json.decode(content)
-  if not decoded_data then
-    return nil, "Erro ao decodificar JSON"
+  local decoded = Json.decode(content)
+  if not decoded then
+    print('Erro ao decodificar o JSON.')
+    return nil
   end
 
-  return decoded_data
+  self.data[name] = decoded
+  return decoded
 end
 
-return Data
+return data_manager
