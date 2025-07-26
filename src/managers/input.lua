@@ -78,6 +78,7 @@ function InputManager:new()
   end)
 end
 
+---@type InputManager
 local input_manager = InputManager()
 
 function InputManager:update()

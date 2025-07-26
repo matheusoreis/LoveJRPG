@@ -14,6 +14,9 @@ function OptionsScene:on_enter()
 end
 
 function OptionsScene:on_update(dt)
+  if self.input:is_action_pressed('back') then
+    self.scene:pop()
+  end
 end
 
 function OptionsScene:on_draw(width, height)

@@ -12,6 +12,7 @@ function ResourceManager:new()
   self.images = {}
 end
 
+---@type ResourceManager
 local resource_manager = ResourceManager()
 
 --- Armazena um recurso em cache se ainda não estiver presente.

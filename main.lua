@@ -9,6 +9,8 @@ require('src.shared.events')
 
 local Config = require('src.config')
 
+---@type InputManager
+local Input = require('src.managers.input')
 ---@type DataManager
 local Data = require('src.managers.data')
 ---@type AudioManager
@@ -63,6 +65,7 @@ end
 
 function love.update(dt)
   Scene:update(dt)
+  Input:update()
 end
 
 function love.draw()

@@ -14,6 +14,7 @@ function AudioManager:new()
   self.se_volume = 1
 end
 
+---@type AudioManager
 local audio_manager = AudioManager()
 
 --- Verifica se o arquivo é um formato de áudio suportado.

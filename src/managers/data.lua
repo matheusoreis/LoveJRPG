@@ -15,6 +15,7 @@ function DataManager:new()
   end
 end
 
+---@type DataManager
 local data_manager = DataManager()
 
 --- Carrega os dados do jogo do arquivo informado.

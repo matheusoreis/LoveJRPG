@@ -14,25 +14,59 @@ function SceneManager:new()
   Transition.opacity = 0
 end
 
-function SceneManager:peek()
-  return self.stack[#self.stack]
+--- Retorna a cena atual ativa
+function SceneManager:current()
+  return self.current_scene
 end
 
-function SceneManager:push(scene)
-  self.stack = {}
+--- Retorna o número de cenas na pilha
+function SceneManager:count()
+  return #self.stack
+end
 
-  local new_scene = scene(self)
+--- Empilha uma nova cena (como Navigator.push)
+---@param scene_class any
+function SceneManager:push(scene_class)
+  local new_scene = scene_class(self)
   table.insert(self.stack, new_scene)
-
   self:switch_to(new_scene)
 end
 
+--- Remove a cena atual e volta para a anterior (como Navigator.pop)
 function SceneManager:pop()
+  if #self.stack <= 1 then
+    return
+  end
+
   table.remove(self.stack)
-  local top = self:peek()
+  local top = self.stack[#self.stack]
   self:switch_to(top)
 end
 
+--- Substitui a cena atual por outra (como pushReplacement)
+---@param scene_class any
+function SceneManager:replace(scene_class)
+  local current = self.stack[#self.stack]
+  if current and getmetatable(current) == scene_class then
+    return
+  end
+
+  if #self.stack > 0 then
+    table.remove(self.stack)
+  end
+
+  self:push(scene_class)
+end
+
+--- Limpa toda a pilha e empilha uma nova cena (como pushAndRemoveUntil)
+---@param scene_class any
+function SceneManager:clear_and_push(scene_class)
+  self.stack = {}
+  self:push(scene_class)
+end
+
+--- Troca de cena com transição
+---@param new_scene any
 function SceneManager:switch_to(new_scene)
   if self.transition_active then
     return
@@ -51,6 +85,7 @@ function SceneManager:switch_to(new_scene)
   end
 end
 
+--- Atualiza a cena e gerencia transições
 function SceneManager:update(dt)
   if self.transition_active then
     Transition:update(dt)
@@ -76,21 +111,17 @@ function SceneManager:update(dt)
       self.transition_active = false
     end
   else
-    ---@diagnostic disable-next-line: invisible
     if self.current_scene and self.current_scene.update then
-      ---@diagnostic disable-next-line: invisible
       self.current_scene:update(dt)
     end
   end
 end
 
---- Chama o draw das scenes
---- @param width number
---- @param height number
+--- Desenha a cena atual e a transição
+---@param width number
+---@param height number
 function SceneManager:draw(width, height)
-  ---@diagnostic disable-next-line: invisible
   if self.current_scene and self.current_scene.draw then
-    ---@diagnostic disable-next-line: invisible
     self.current_scene:draw(width, height)
   end
 
