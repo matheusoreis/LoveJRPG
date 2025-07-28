@@ -25,7 +25,7 @@ function InputManager:new()
     rb    = { "e", "gamepad:rightshoulder" },
 
     start = { "return", "gamepad:start" },
-    back  = { "escape", "gamepad:back" }
+    back  = { "escape", "gamepad:back", "d", "gamepad:b" }
   }
 
   self.held = {}

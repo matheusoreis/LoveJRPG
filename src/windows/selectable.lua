@@ -3,12 +3,13 @@ local Text = require('src.widgets.text')
 local Input = require('src.managers.input')
 local Resource = require('src.managers.resource')
 local NinePatchRect = require('src.shared.ninepatch')
+local Audio = require('src.managers.audio')
 
 --- @class WindowSelectable : WindowBase
 local WindowSelectable = WindowBase:extend()
 
-function WindowSelectable:new(x, y, w, h, items, columns, rows)
-  WindowSelectable.super.new(self, x, y, w, h)
+function WindowSelectable:new(x, y, w, h, scene, items, columns, rows)
+  WindowSelectable.super.new(self, x, y, w, h, scene)
 
   self.items = items or {}
   self.index = 1
@@ -16,22 +17,30 @@ function WindowSelectable:new(x, y, w, h, items, columns, rows)
   self.rows = rows or 1
 
   self.scroll_page = 0
+
+  self.default_font = Resource:get_font("default", 14)
 end
 
 function WindowSelectable:on_load()
   self.hover_texture = Resource:get_system('hover')
   self.hover_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.hover_texture)
+
+  self.a_texture = Resource:get_system('a')
 end
 
 --- @param dt number
 function WindowSelectable:on_update(dt)
   if Input:is_action_pressed('down') then
+    Audio:play_se('move')
     self.index = self.index + self.columns
   elseif Input:is_action_pressed('up') then
+    Audio:play_se('move')
     self.index = self.index - self.columns
   elseif Input:is_action_pressed('right') then
+    Audio:play_se('move')
     self.index = self.index + 1
   elseif Input:is_action_pressed('left') then
+    Audio:play_se('move')
     self.index = self.index - 1
   end
 
@@ -46,6 +55,7 @@ function WindowSelectable:on_update(dt)
   if Input:is_action_pressed('a') then
     local current = self.items[self.index]
     if current and current.action then
+      Audio:play_se('select')
       self:on_action(current.action)
     end
   end
@@ -73,10 +83,19 @@ function WindowSelectable:on_draw()
 
     if item_index == self.index then
       self.hover_rect:draw(item_pos_x, item_pos_y, item_width, item_height)
+      if self.a_texture then
+        local icon_w, icon_h = self.a_texture:getWidth(), self.a_texture:getHeight()
+        local padding = 4
+
+        local icon_x = item_pos_x + item_width - icon_w - padding
+        local icon_y = item_pos_y + item_height - icon_h - padding
+
+        love.graphics.draw(self.a_texture, icon_x, icon_y)
+      end
     end
 
     local item_name = self.items[item_index].name or tostring(self.items[item_index])
-    local text_object = Text(item_name, 0, 0)
+    local text_object = Text(item_name, 0, 0, self.default_font)
 
     local text_pos_x = item_pos_x + (item_width - text_object:getWidth()) / 2
     local text_pos_y = item_pos_y + (item_height - text_object:getHeight()) / 2

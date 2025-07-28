@@ -6,11 +6,12 @@ local NinePatchRect = require('src.shared.ninepatch')
 --- @class WindowBase : Object
 local WindowBase = Object:extend()
 
-function WindowBase:new(x, y, w, h)
+function WindowBase:new(x, y, w, h, scene)
   self.x = x
   self.y = y
   self.w = w
   self.h = h
+  self.scene = scene
 
   self.padding = { 8, 8 }
   self.tween_progress = 0
