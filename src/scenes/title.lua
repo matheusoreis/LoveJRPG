@@ -1,7 +1,6 @@
 local SceneBase = require('src.scenes.scene')
 local WelcomeWindow = require('src.windows.welcome')
 local TitleWindow = require('src.windows.title')
-local Input = require('src.managers.input')
 
 ---@class  TitleScene : SceneBase
 ---@field title_window TitleWindow
@@ -33,8 +32,6 @@ function TitleScene:on_load()
   )
 
   self:add_window('title', title_window)
-
-  self.title_window = title_window
 end
 
 function TitleScene:on_enter()
