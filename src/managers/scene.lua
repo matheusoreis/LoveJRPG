@@ -76,7 +76,7 @@ end
 
 --- Troca de cena com transição
 ---@param new_scene any
----@param resume_args table|nil argumentos para on_resume (usado no pop)
+---@param resume_args table|nil
 function SceneManager:switch_to(new_scene, resume_args)
   if self.transition_active then
     return
@@ -84,7 +84,7 @@ function SceneManager:switch_to(new_scene, resume_args)
 
   if self.current_scene then
     self.next_scene = new_scene
-    self.resume_args = resume_args -- Guarda os argumentos
+    self.resume_args = resume_args
     self.transition_active = true
     Transition:fade_out(0.5)
   else
@@ -94,7 +94,7 @@ function SceneManager:switch_to(new_scene, resume_args)
 
     if self.current_scene then
       if resume_args and self.current_scene.on_resume then
-        self.current_scene:on_resume(table.unpack(resume_args))
+        self.current_scene:on_resume(unpack(resume_args))
       elseif self.current_scene.on_enter then
         self.current_scene:on_enter()
       end
@@ -121,7 +121,7 @@ function SceneManager:update(dt)
 
       if self.current_scene then
         if self.resume_args and self.current_scene.on_resume then
-          self.current_scene:on_resume(table.unpack(self.resume_args))
+          self.current_scene:on_resume(unpack(self.resume_args))
         elseif self.current_scene.on_enter then
           self.current_scene:on_enter()
         end
