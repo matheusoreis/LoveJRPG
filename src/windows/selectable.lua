@@ -32,22 +32,10 @@ function WindowSelectable:on_load()
   self.a_texture = Resource:get_system('a')
 end
 
-function WindowSelectable:set_on_select(callback)
-  self.callbacks.on_select = callback
-  return self
+function WindowSelectable:on_item_selected(item, index)
 end
 
-function WindowSelectable:set_on_action(callback)
-  self.callbacks.on_action = callback
-  return self
-end
-
-function WindowSelectable:get_selected_item()
-  return self.items[self.index]
-end
-
-function WindowSelectable:get_selected_index()
-  return self.index
+function WindowSelectable:on_item_action(item, index)
 end
 
 --- @param dt number
@@ -74,14 +62,18 @@ function WindowSelectable:on_update(dt)
 
   if self.index ~= previous_index then
     local selected_item = self.items[self.index]
-    if self.callbacks.on_select and selected_item then
-      self.callbacks.on_select(selected_item, self.index, self)
+    if selected_item then
+      self:on_item_selected(selected_item, self.index)
+      if self.callbacks.on_select then
+        self.callbacks.on_select(selected_item, self.index, self)
+      end
     end
   end
 
   if Input:is_action_pressed('a') then
     local current_item = self.items[self.index]
     if current_item then
+      self:on_item_action(current_item, self.index)
       if self.callbacks.on_action then
         self.callbacks.on_action(current_item, self.index, self)
       end

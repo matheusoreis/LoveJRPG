@@ -25,25 +25,11 @@ function TitleScene:on_load()
   local welcome_window = WelcomeWindow(center_x_welcome, start_y, welcome_size[1], welcome_size[2])
   self:add_window('welcome', welcome_window)
 
-  local title_items = {
-    { name = "Acessar",   action = "sign_in" },
-    { name = "Cadastrar", action = "sign_up" },
-    { name = "Opções",    action = "options" },
-    { name = "Sair",      action = "exit" },
-  }
-
   local title_window = TitleWindow(
     center_x_title,
     (start_y + welcome_size[2]) + 10,
     title_size[1],
-    title_size[2],
-    title_items, 1, 4
-  )
-
-  title_window:set_on_action(
-    function(item, index, window)
-      self:on_menu_action(item.action, item, index)
-    end
+    title_size[2]
   )
 
   self:add_window('title', title_window)
@@ -54,18 +40,6 @@ end
 function TitleScene:on_enter()
   self:open_window('welcome')
   self:open_window('title')
-end
-
-function TitleScene:on_menu_action(action, item, index)
-  print("Executando ação:", action, "do item", item.name)
-
-  if action == 'sign_in' then
-  elseif action == 'sign_up' then
-  elseif action == 'options' then
-    self.scene:push(require('src.scenes.options'))
-  elseif action == 'exit' then
-    love.event.quit()
-  end
 end
 
 function TitleScene:on_draw(width, height)

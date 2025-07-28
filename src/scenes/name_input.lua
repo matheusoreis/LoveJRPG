@@ -28,10 +28,6 @@ function NameInputScene:on_load()
     "name"
   )
 
-  self.input_window:set_on_action(function(item, index, window)
-    self:on_input_action(item, index)
-  end)
-
   self:add_window('input', self.input_window)
 end
 
@@ -82,7 +78,6 @@ function NameInputScene:confirm_name()
 
   local current_name = self.input_window:get_current_text()
   self.help_window:set_text(string.format("Nome '%s' confirmado! Pressione ESC para voltar", current_name))
-  self.scene:pop(current_name)
 end
 
 function NameInputScene:on_update(dt)
