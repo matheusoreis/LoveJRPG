@@ -8,8 +8,8 @@ local Audio = require('src.managers.audio')
 --- @class WindowSelectable : WindowBase
 local WindowSelectable = WindowBase:extend()
 
-function WindowSelectable:new(x, y, w, h, scene, items, columns, rows)
-  WindowSelectable.super.new(self, x, y, w, h, scene)
+function WindowSelectable:new(x, y, w, h, items, columns, rows)
+  WindowSelectable.super.new(self, x, y, w, h)
 
   self.items = items or {}
   self.index = 1
@@ -19,6 +19,11 @@ function WindowSelectable:new(x, y, w, h, scene, items, columns, rows)
   self.scroll_page = 0
 
   self.default_font = Resource:get_font("default", 14)
+
+  self.callbacks = {
+    on_select = nil,
+    on_action = nil,
+  }
 end
 
 function WindowSelectable:on_load()
@@ -28,8 +33,28 @@ function WindowSelectable:on_load()
   self.a_texture = Resource:get_system('a')
 end
 
+function WindowSelectable:set_on_select(callback)
+  self.callbacks.on_select = callback
+  return self
+end
+
+function WindowSelectable:set_on_action(callback)
+  self.callbacks.on_action = callback
+  return self
+end
+
+function WindowSelectable:get_selected_item()
+  return self.items[self.index]
+end
+
+function WindowSelectable:get_selected_index()
+  return self.index
+end
+
 --- @param dt number
 function WindowSelectable:on_update(dt)
+  local previous_index = self.index
+
   if Input:is_action_pressed('down') then
     Audio:play_se('move')
     self.index = self.index + self.columns
@@ -52,17 +77,23 @@ function WindowSelectable:on_update(dt)
     self.scroll_page = new_page
   end
 
-  if Input:is_action_pressed('a') then
-    local current = self.items[self.index]
-    if current and current.action then
-      Audio:play_se('select')
-      self:on_action(current.action)
+  if self.index ~= previous_index then
+    local selected_item = self.items[self.index]
+    if self.callbacks.on_select and selected_item then
+      self.callbacks.on_select(selected_item, self.index, self)
     end
   end
-end
 
---- @param action string
-function WindowSelectable:on_action(action)
+  if Input:is_action_pressed('a') then
+    local current_item = self.items[self.index]
+    if current_item then
+      Audio:play_se('select')
+
+      if self.callbacks.on_action then
+        self.callbacks.on_action(current_item, self.index, self)
+      end
+    end
+  end
 end
 
 function WindowSelectable:on_draw()
@@ -97,8 +128,8 @@ function WindowSelectable:on_draw()
     local item_name = self.items[item_index].name or tostring(self.items[item_index])
     local text_object = Text(item_name, 0, 0, self.default_font)
 
-    local text_pos_x = item_pos_x + (item_width - text_object:getWidth()) / 2
-    local text_pos_y = item_pos_y + (item_height - text_object:getHeight()) / 2
+    local text_pos_x = item_pos_x + (item_width - text_object:get_width()) / 2
+    local text_pos_y = item_pos_y + (item_height - text_object:get_height()) / 2
 
     text_object.x = text_pos_x
     text_object.y = text_pos_y

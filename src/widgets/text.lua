@@ -12,16 +12,16 @@ function Text:new(text, x, y, font, color)
   self.textObject = love.graphics.newText(self.font, self.text)
 end
 
-function Text:setText(newText)
+function Text:set_text(newText)
   self.text = newText
   self.textObject:set(self.text)
 end
 
-function Text:getWidth()
+function Text:get_width()
   return self.textObject:getWidth()
 end
 
-function Text:getHeight()
+function Text:get_height()
   return self.textObject:getHeight()
 end
 
