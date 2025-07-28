@@ -1,4 +1,4 @@
-local Object = require('src.lib.classic')
+local Object = require('src.shared.object')
 local Text = require('src.windows.widgets.text')
 
 local TextArea = Text:extend()
