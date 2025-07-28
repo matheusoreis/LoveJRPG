@@ -32,6 +32,9 @@ end
 function SceneBase:on_enter()
 end
 
+function SceneBase:on_resume(...)
+end
+
 function SceneBase:add_window(name, window)
   self.windows[name] = window
 end

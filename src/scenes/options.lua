@@ -17,7 +17,6 @@ function OptionsScene:on_load()
   self.help_window = WindowHelp(help_x, help_y, help_size[1], help_size[2])
   self:add_window('help', self.help_window)
 
-  -- Criar window de options
   local options_size = { 220, 140 }
   local center_x = (screen_width - options_size[1]) / 2
   local center_y = (screen_height - options_size[2]) / 2
@@ -35,12 +34,10 @@ function OptionsScene:on_load()
     options_items, 1, 4
   )
 
-  -- Configurar callback de seleção (mostra help)
   self.options_window:set_on_select(function(item, index, window)
     self:on_option_highlight(item, index)
   end)
 
-  -- Configurar callback de ação (executa comando)
   self.options_window:set_on_action(function(item, index, window)
     self:on_option_action(item.action, item, index)
   end)
@@ -52,11 +49,14 @@ function OptionsScene:on_enter()
   self:open_window('options')
   self:open_window('help')
 
-  -- Mostra help do primeiro item
   local first_item = self.options_window:get_selected_item()
   if first_item then
     self:on_option_highlight(first_item, 1)
   end
+end
+
+function SceneBase:on_resume(...)
+  print(...)
 end
 
 function OptionsScene:on_update(dt)
@@ -65,7 +65,6 @@ function OptionsScene:on_update(dt)
   end
 end
 
--- Mostra o help ao navegar
 function OptionsScene:on_option_highlight(item, index)
   local help_text = item.help or ""
   if self.help_window then
@@ -73,23 +72,16 @@ function OptionsScene:on_option_highlight(item, index)
   end
 end
 
--- Evento quando confirma
 function OptionsScene:on_option_action(action, item, index)
   print("Executando ação:", action, "do item", item.name, " index: ", index)
 
   if action == 'general' then
     self.scene:push(require('src.scenes.name_input'))
   elseif action == 'audio' then
-    -- Abrir scene de configurações de áudio
-    -- self.scene:push(require('src.scenes.options.audio'))
     print("Abrindo configurações de áudio...")
   elseif action == 'graphics' then
-    -- Abrir scene de configurações de vídeo
-    -- self.scene:push(require('src.scenes.options.graphics'))
     print("Abrindo configurações de vídeo...")
   elseif action == 'shortcuts' then
-    -- Abrir scene de configurações de atalhos
-    -- self.scene:push(require('src.scenes.options.shortcuts'))
     print("Abrindo configurações de atalhos...")
   elseif action == 'back' then
     self.scene:pop()

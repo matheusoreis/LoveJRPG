@@ -23,15 +23,14 @@ function WindowInput:new(x, y, w, h, max_length, input_type, custom_chars)
 end
 
 function WindowInput:calculate_columns()
-  -- Lógica para calcular colunas baseado no tipo de input
   if self.input_type == "numeric" then
-    return 3  -- 0-9 + DEL + OK = 12 items, 4x3 grid
+    return 3
   elseif self.input_type == "name" then
-    return 8  -- Mais compacto para nomes
+    return 8
   elseif self.input_type == "chat" then
-    return 10 -- Grid maior para chat
+    return 10
   else
-    return 10 -- Padrão
+    return 10
   end
 end
 
@@ -157,7 +156,7 @@ function WindowInput:create_input_items()
     })
   end
 
-  -- Comandos especiais (sempre presentes)
+  -- Comandos especiais
   if self.input_type ~= "numeric" then
     table.insert(items, {
       name = "ESP",
@@ -181,7 +180,6 @@ function WindowInput:create_input_items()
   return items
 end
 
--- Métodos de manipulação de texto
 function WindowInput:get_current_text()
   return self.current_text
 end
@@ -212,7 +210,6 @@ function WindowInput:clear_text()
   return true
 end
 
--- Métodos de validação
 function WindowInput:is_valid()
   return #self.current_text > 0
 end

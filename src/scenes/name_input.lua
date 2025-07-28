@@ -21,15 +21,13 @@ function NameInputScene:on_load()
   local input_x = (screen_width - input_size[1]) / 2
   local input_y = (screen_height - input_size[2]) / 2
 
-  -- Usar WindowInput com tipo NAME para nomes de personagem
   self.input_window = WindowInput(
     input_x, input_y,
     input_size[1], input_size[2],
-    8,     -- max_length
-    "chat" -- tipo de input
+    8,
+    "name"
   )
 
-  -- Configurar callbacks seguindo o padrão da OptionsScene
   self.input_window:set_on_action(function(item, index, window)
     self:on_input_action(item, index)
   end)
@@ -40,6 +38,7 @@ end
 function NameInputScene:on_enter()
   self:open_window('help')
   self:open_window('input')
+
   self.help_window:set_text("Digite o nome do seu personagem (máximo 8 caracteres)")
 end
 
@@ -82,8 +81,8 @@ function NameInputScene:confirm_name()
   end
 
   local current_name = self.input_window:get_current_text()
-  print("Nome confirmado:", current_name)
   self.help_window:set_text(string.format("Nome '%s' confirmado! Pressione ESC para voltar", current_name))
+  self.scene:pop(current_name)
 end
 
 function NameInputScene:on_update(dt)

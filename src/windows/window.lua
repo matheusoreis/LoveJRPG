@@ -15,16 +15,13 @@ function WindowBase:new(x, y, w, h)
   self.padding = { 8, 8 }
   self.tween_progress = 0
 
-  -- Estados de animação
   self.tween = nil
   self.opening = false
   self.closing = false
 
-  -- Background
   self.background_texture = Resource:get_system('window_background')
   self.background_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.background_texture)
 
-  -- Frame
   self.frame_texture = Resource:get_system('window_frame')
   self.frame_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.frame_texture)
 
@@ -114,11 +111,9 @@ function WindowBase:draw()
     love.graphics.scale(1, self.tween_progress)
     love.graphics.translate(0, -self.h / 2)
 
-    -- Desenhar background
     love.graphics.setColor(1, 1, 1, 1)
     self.background_rect:draw(0, 0, self.w, self.h)
 
-    -- Desenhar frame por cima
     self.frame_rect:draw(0, 0, self.w, self.h)
 
     love.graphics.pop()

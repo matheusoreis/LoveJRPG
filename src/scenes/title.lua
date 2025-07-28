@@ -56,33 +56,16 @@ function TitleScene:on_enter()
   self:open_window('title')
 end
 
--- Evento quando confirma/clica em um item
 function TitleScene:on_menu_action(action, item, index)
   print("Executando ação:", action, "do item", item.name)
 
   if action == 'sign_in' then
-    -- Lógica para entrar
-    -- self.scene:change(require('src.scenes.login'))
   elseif action == 'sign_up' then
-    -- Lógica para cadastrar
-    -- self.scene:change(require('src.scenes.register'))
   elseif action == 'options' then
     self.scene:push(require('src.scenes.options'))
   elseif action == 'exit' then
     love.event.quit()
   end
-end
-
--- Remove o método antigo que contaminava a scene
--- function TitleScene:on_window_action(action) -- <-- REMOVIDO!
-
--- Métodos utilitários se precisar acessar dados da window
-function TitleScene:get_selected_menu_item()
-  return self.title_window:get_selected_item()
-end
-
-function TitleScene:get_selected_menu_index()
-  return self.title_window:get_selected_index()
 end
 
 function TitleScene:on_draw(width, height)
