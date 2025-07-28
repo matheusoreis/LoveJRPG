@@ -1,29 +1,17 @@
 local WindowSelectable = require('src.windows.selectable')
 local Text = require('src.widgets.text')
 local Resource = require('src.managers.resource')
-local Audio = require('src.managers.audio')
 
 --- @class WindowInput : WindowSelectable
 local WindowInput = WindowSelectable:extend()
 
--- Tipos de input pré-definidos
-WindowInput.INPUT_TYPES = {
-  NAME = "name",          -- Para nomes de personagem (A-Z, a-z, espaço)
-  CHAT = "chat",          -- Para chat (A-Z, a-z, 0-9, pontuação, espaço)
-  NUMERIC = "numeric",    -- Apenas números
-  ALPHANUMERIC = "alpha", -- Letras e números
-  FULL = "full"           -- Tudo disponível
-}
-
 function WindowInput:new(x, y, w, h, max_length, input_type, custom_chars)
-  self.input_type = input_type or WindowInput.INPUT_TYPES.FULL
+  self.input_type = input_type or "full"
   self.custom_chars = custom_chars or {}
 
-  -- Criar os items baseado no tipo
   local input_items = self:create_input_items()
 
-  -- Calcular grid automaticamente baseado no número de items
-  local columns = self:calculate_columns(#input_items)
+  local columns = self:calculate_columns()
   local rows = math.ceil(#input_items / columns)
 
   WindowInput.super.new(self, x, y, w, h, input_items, columns, rows)
@@ -34,13 +22,13 @@ function WindowInput:new(x, y, w, h, max_length, input_type, custom_chars)
   self.letter_font = Resource:get_font("default", 14)
 end
 
-function WindowInput:calculate_columns(item_count)
+function WindowInput:calculate_columns()
   -- Lógica para calcular colunas baseado no tipo de input
-  if self.input_type == WindowInput.INPUT_TYPES.NUMERIC then
+  if self.input_type == "numeric" then
     return 3  -- 0-9 + DEL + OK = 12 items, 4x3 grid
-  elseif self.input_type == WindowInput.INPUT_TYPES.NAME then
+  elseif self.input_type == "name" then
     return 8  -- Mais compacto para nomes
-  elseif self.input_type == WindowInput.INPUT_TYPES.CHAT then
+  elseif self.input_type == "chat" then
     return 10 -- Grid maior para chat
   else
     return 10 -- Padrão
@@ -50,7 +38,7 @@ end
 function WindowInput:create_input_items()
   local items = {}
 
-  if self.input_type == WindowInput.INPUT_TYPES.NUMERIC then
+  if self.input_type == "numeric" then
     -- Apenas números 0-9
     for i = 48, 57 do
       table.insert(items, {
@@ -59,7 +47,7 @@ function WindowInput:create_input_items()
         value = string.char(i)
       })
     end
-  elseif self.input_type == WindowInput.INPUT_TYPES.NAME then
+  elseif self.input_type == "name" then
     -- Letras maiúsculas A-Z
     for i = 65, 90 do
       table.insert(items, {
@@ -76,7 +64,7 @@ function WindowInput:create_input_items()
         value = string.char(i)
       })
     end
-  elseif self.input_type == WindowInput.INPUT_TYPES.ALPHANUMERIC then
+  elseif self.input_type == "alphanumeric" then
     -- A-Z
     for i = 65, 90 do
       table.insert(items, {
@@ -101,7 +89,7 @@ function WindowInput:create_input_items()
         value = string.char(i)
       })
     end
-  elseif self.input_type == WindowInput.INPUT_TYPES.CHAT then
+  elseif self.input_type == "chat" then
     -- A-Z
     for i = 65, 90 do
       table.insert(items, {
@@ -135,7 +123,7 @@ function WindowInput:create_input_items()
         value = char
       })
     end
-  else -- FULL
+  else -- "full"
     -- Tudo: A-Z, a-z, 0-9
     for i = 65, 90 do
       table.insert(items, {
@@ -170,7 +158,7 @@ function WindowInput:create_input_items()
   end
 
   -- Comandos especiais (sempre presentes)
-  if self.input_type ~= WindowInput.INPUT_TYPES.NUMERIC then
+  if self.input_type ~= "numeric" then
     table.insert(items, {
       name = "ESP",
       action = "space",
@@ -204,18 +192,15 @@ end
 
 function WindowInput:add_char(char)
   if #self.current_text < self.max_length then
-    Audio:play_se('select')
     self.current_text = self.current_text .. char
     return true
   else
-    Audio:play_se('error')
     return false
   end
 end
 
 function WindowInput:delete_char()
   if #self.current_text > 0 then
-    Audio:play_se('cancel')
     self.current_text = string.sub(self.current_text, 1, -2)
     return true
   end

@@ -3,7 +3,6 @@ local Text = require('src.widgets.text')
 local Input = require('src.managers.input')
 local Resource = require('src.managers.resource')
 local NinePatchRect = require('src.shared.ninepatch')
-local Audio = require('src.managers.audio')
 
 --- @class WindowSelectable : WindowBase
 local WindowSelectable = WindowBase:extend()
@@ -56,16 +55,12 @@ function WindowSelectable:on_update(dt)
   local previous_index = self.index
 
   if Input:is_action_pressed('down') then
-    Audio:play_se('move')
     self.index = self.index + self.columns
   elseif Input:is_action_pressed('up') then
-    Audio:play_se('move')
     self.index = self.index - self.columns
   elseif Input:is_action_pressed('right') then
-    Audio:play_se('move')
     self.index = self.index + 1
   elseif Input:is_action_pressed('left') then
-    Audio:play_se('move')
     self.index = self.index - 1
   end
 
@@ -87,8 +82,6 @@ function WindowSelectable:on_update(dt)
   if Input:is_action_pressed('a') then
     local current_item = self.items[self.index]
     if current_item then
-      Audio:play_se('select')
-
       if self.callbacks.on_action then
         self.callbacks.on_action(current_item, self.index, self)
       end

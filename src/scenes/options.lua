@@ -1,7 +1,6 @@
 local SceneBase = require('src.scenes.scene')
 local OptionsWindow = require('src.windows.options')
 local WindowHelp = require('src.windows.help')
-local Audio = require('src.managers.audio')
 
 ---@class OptionsScene : SceneBase
 local OptionsScene = SceneBase:extend()
@@ -62,7 +61,6 @@ end
 
 function OptionsScene:on_update(dt)
   if self.input:is_action_pressed('back') then
-    Audio:play_se('cancel')
     self.scene:pop()
   end
 end
@@ -94,7 +92,6 @@ function OptionsScene:on_option_action(action, item, index)
     -- self.scene:push(require('src.scenes.options.shortcuts'))
     print("Abrindo configurações de atalhos...")
   elseif action == 'back' then
-    Audio:play_se('cancel')
     self.scene:pop()
   end
 end

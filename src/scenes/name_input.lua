@@ -21,11 +21,12 @@ function NameInputScene:on_load()
   local input_x = (screen_width - input_size[1]) / 2
   local input_y = (screen_height - input_size[2]) / 2
 
+  -- Usar WindowInput com tipo NAME para nomes de personagem
   self.input_window = WindowInput(
     input_x, input_y,
     input_size[1], input_size[2],
-    8,
-    WindowInput.INPUT_TYPES.ALPHANUMERIC
+    8,     -- max_length
+    "chat" -- tipo de input
   )
 
   -- Configurar callbacks seguindo o padrão da OptionsScene
