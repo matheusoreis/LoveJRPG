@@ -21,20 +21,23 @@ function WindowBase:new(x, y, w, h)
   self.closing = false
 
   -- Background
-  self.background = Resource:get_system('window_background')
-  self.background_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.background)
+  self.background_texture = Resource:get_system('window_background')
+  self.background_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.background_texture)
 
   -- Frame
-  self.frame = Resource:get_system('window_frame')
-  self.frame_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.frame)
+  self.frame_texture = Resource:get_system('window_frame')
+  self.frame_rect = NinePatchRect({ top = 6, bottom = 6, left = 6, right = 6 }, self.frame_texture)
+
+  self:on_load()
 end
 
----@private
+function WindowBase:on_load()
+end
+
 function WindowBase:is_open()
   return self.tween_progress == 1
 end
 
----@private
 function WindowBase:is_closed()
   return self.tween_progress == 0
 end

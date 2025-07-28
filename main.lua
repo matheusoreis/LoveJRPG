@@ -32,14 +32,6 @@ function love.load()
 
   -- Configura o título da janela.
   love.window.setTitle(title .. ' ' .. version)
-  -- Configura o modo da janela.
-  love.window.setMode(screenWidth, screenHeight, {
-    minwidth = minWidth,
-    minheight = minHeight,
-    resizable = resizable,
-    fullscreen = fullscreen,
-    vsync = vsync,
-  })
   -- Configura o filtro das texturas
   love.graphics.setDefaultFilter('nearest', 'nearest')
   -- Configura a visibilidade do mouse
@@ -60,7 +52,7 @@ function love.load()
   Audio:load()
 
   -- Inicializa a scene principal
-  Scene:push(require('src.scenes.menu'))
+  Scene:push(require('src.scenes.title'))
 end
 
 function love.update(dt)

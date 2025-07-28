@@ -10,7 +10,7 @@ function MenuScene:on_load()
 
   self.background = self.resource:get_title('background')
 
-  local title_window = TitleWindow(20, 20, 500, 50)
+  local title_window = TitleWindow(20, 20, 300, 200)
   self:add_window("title", title_window)
 end
 
@@ -21,19 +21,7 @@ function MenuScene:on_enter()
 end
 
 function MenuScene:on_update(dt)
-  if self.input:is_action_pressed("down") then
-    print("Fechando a janela...")
-    self:close_window("title")
-  end
 
-  if self.input:is_action_pressed("up") then
-    print("Abrindo a janela...")
-    self:open_window("title")
-  end
-
-  if self.input:is_action_pressed('start') then
-    self.scene:push(require('src.scenes.options'))
-  end
 end
 
 function MenuScene:on_draw(width, height)

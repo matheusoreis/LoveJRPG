@@ -1,16 +1,29 @@
-local WindowBase = require('src.windows.window')
+local WindowSelectable = require('src.windows.selectable')
 
---- @class TitleWindow : WindowBase
-local TitleWindow = WindowBase:extend()
+--- @class TitleWindow : WindowSelectable
+local TitleWindow = WindowSelectable:extend()
 
-function TitleWindow:on_load()
+function TitleWindow:new(x, y, w, h)
+  local items = {
+    { name = "Novo Jogo", action = "new_game" },
+    { name = "Carregar",  action = "load_game" },
+    { name = "Opções",    action = "options" },
+    { name = "Sair",      action = "exit" },
+  }
+
+  TitleWindow.super.new(self, x, y, w, h, items, 1, 4)
 end
 
-function TitleWindow:on_update(dt)
-end
-
-function TitleWindow:on_draw()
-  love.graphics.print("É! A janela foi finalizada e o conteúdo está sendo desenhado dentro dela.")
+function TitleWindow:on_action(action)
+  if action == "new_game" then
+    print("Novo jogo iniciado!")
+  elseif action == "load_game" then
+    print("Carregando jogo...")
+  elseif action == "options" then
+    print("Abrindo opções...")
+  elseif action == "exit" then
+    love.event.quit()
+  end
 end
 
 return TitleWindow
